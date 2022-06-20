@@ -7,7 +7,6 @@
 #include <QTimer>
 
 #include <cstdlib>
-#include <sstream>
 #include <iostream>
 
 #define VERSION "v0.1"
