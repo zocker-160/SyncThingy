@@ -25,9 +25,10 @@ Steam Deck users can thank me later.
 
 ```bash
 git clone https://github.com/zocker-160/SyncThingy.git
-mkdir out && cd out
-cmake ..
+cmake -S . -B out
+cd out
 make
+sudo make install (optional)
 ```
 
 ### NOTE for non-Flatpak users
