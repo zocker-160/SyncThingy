@@ -21,7 +21,7 @@ private:
 
     void setupUi() {
         auto openGitHubAction = new QAction(QString().append(APP_NAME).append(" ").append(VERSION), this);
-        auto showBrowserAction = new QAction("Show Browser", this);
+        auto showBrowserAction = new QAction("Open WebUI", this);
         auto exitAction = new QAction("Exit", this);
         auto menu = new QMenu();
 
