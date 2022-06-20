@@ -4,7 +4,7 @@ Exec=SyncThingy
 GenericName=File synchronization
 Comment=SyncThingy = Synthing + simple tray indicator
 Icon=syncthing
-StartupNotify=true
+StartupNotify=false
 Terminal=false
 Type=Application
 Keywords=synchronization;interface;
