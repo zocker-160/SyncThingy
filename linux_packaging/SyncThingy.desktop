@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=SyncThingy
+Exec=SyncThingy
+GenericName=SyncThingy = Synthing + simple tray incidator
+Icon=syncthing
+StartupNotify=true
+Terminal=false
+Type=Application
