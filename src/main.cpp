@@ -131,11 +131,12 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationVersion(VERSION);
 
     QIcon icon;
-    if (std::getenv("FLATPAK_ID") == nullptr) {
+    const char* flatpakID = std::getenv("FLATPAK_ID");
+    if (flatpakID == nullptr) {
         icon = QIcon::fromTheme("syncthing");
     } else {
         std::cout << "running inside Flatpak \n";
-        icon = QIcon::fromTheme(APP_NAME);
+        icon = QIcon::fromTheme(flatpakID);
     }
     TrayIcon tray(icon);
 
