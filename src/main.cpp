@@ -11,7 +11,7 @@
 #include <iostream>
 
 #define VERSION "v0.1"
-#define APP_NAME "SyncThingyy"
+#define APP_NAME "SyncThingy"
 
 class TrayIcon: public QSystemTrayIcon {
 
@@ -81,7 +81,7 @@ private slots:
     };
 
     static void showGitHub() {
-        //TODO
+        system("xdg-open https://github.com/zocker-160/SyncThingy");
     }
 
     void handleActivation(QSystemTrayIcon::ActivationReason reason) {
@@ -115,7 +115,10 @@ public slots:
             syncthingProcess->waitForFinished();
         }
 
-        showMessage("Syncthing stopped", "", icon(), 5000);
+        QString msg = QString("exit code: ").append(QString::number(syncthingProcess->exitCode()));
+
+        if (syncthingProcess->exitCode() == 0)
+            showMessage("Syncthing stopped", msg, icon(), 5000);
 
         QApplication::quit();
     };
