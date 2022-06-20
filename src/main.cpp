@@ -77,11 +77,11 @@ private:
 
 private slots:
     static void showBrowser() {
-        system("xdg-open http://127.0.0.1:8384");
+        (void) system("xdg-open http://127.0.0.1:8384");
     };
 
     static void showGitHub() {
-        system("xdg-open https://github.com/zocker-160/SyncThingy");
+        (void) system("xdg-open https://github.com/zocker-160/SyncThingy");
     }
 
     void handleActivation(QSystemTrayIcon::ActivationReason reason) {
