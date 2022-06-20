@@ -1,7 +1,15 @@
 # SyncThingy
 SyncThingy = Synthing + simple tray incidator
 
-// TODO: screenshots
+![Screenshot1](screenshots/Screenshot_20220620_202001.png)
+
+## Motivation
+
+Why yet another Syncthing tray / statusbar / wrapper / ui ... application?
+
+The answer is simple: there is currently no application available as Flatpak and on Flathub, which offers just the bare minimum: Syncthing and a tray icon.
+
+Steam Deck users can thank me later.
 
 ## Installation
 
