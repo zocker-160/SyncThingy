@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2022 zocker_160 -->
+<component type="desktop">
+    <id>com.github.zocker160.SyncThingy</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPLv3</project_license>
+	<content_rating type="oars-1.1" />
+
+    <name>SyncThingy</name>
+    <developer_name>zocker_160</developer_name>
+    <summary>SyncThingy = Synthing + simple tray incidator</summary>
+	<description>
+        <p>SyncThingy is a very simple and basic tray indicator for Syncthing written in C++.</p>
+        <p>
+        It allows you to see if Syncthing is running, stop it and manage it using the default webui.
+        </p>
+    </description>
+    
+    <screenshots>
+        <screenshot type="default">
+            <image>https://raw.githubusercontent.com/zocker-160/SyncThingy/master/screenshots/Screenshot_20220620_202001.png</image>
+        </screenshot>
+    </screenshots>
+    
+    <url type="homepage">https://github.com/zocker-160/SyncThingy</url>
+    <url type="bugtracker">https://github.com/zocker-160/SyncThingy/issues</url>
+
+    <launchable type="desktop-id">com.github.zocker160.SyncThingy.desktop</launchable>
+    <releases>
+        <release version="0.1" date="2022-06-20" />
+    </releases>
+</component>
