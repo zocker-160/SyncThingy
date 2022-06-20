@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationName(APP_NAME);
     QApplication::setApplicationVersion(VERSION);
 
-    const QIcon icon("assets/logo-512.png");
+    QIcon icon = QIcon::fromTheme("syncthing");
     TrayIcon tray(icon);
 
     if (not tray.syncthingRunning())
