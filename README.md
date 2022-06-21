@@ -3,6 +3,8 @@ SyncThingy = Synthing + simple tray incidator
 
 ![Screenshot1](screenshots/Screenshot_20220620_202001.png)
 
+[<img width="240px" src="https://flathub.org/assets/badges/flathub-badge-en.png" />](https://flathub.org/apps/details/com.github.zocker_160.SyncThingy)
+
 ## Motivation
 
 Why yet another Syncthing tray / statusbar / wrapper / ui ... application?
@@ -10,11 +12,6 @@ Why yet another Syncthing tray / statusbar / wrapper / ui ... application?
 The answer is simple: there is currently no application available as Flatpak and on Flathub, which offers just the bare minimum: Syncthing and a tray icon.
 
 Steam Deck users can thank me later.
-
-## Installation
-
-// Flatpak
-// DEB
 
 ## Compile from source
 
