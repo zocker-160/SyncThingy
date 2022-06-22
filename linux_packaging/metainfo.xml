@@ -27,6 +27,7 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="0.2" date="2022-06-22" />
         <release version="0.1" date="2022-06-20" />
     </releases>
 </component>

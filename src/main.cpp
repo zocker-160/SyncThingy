@@ -9,10 +9,36 @@
 #include <cstdlib>
 #include <iostream>
 
-#define VERSION "v0.1"
+#define VERSION "v0.2"
 #define APP_NAME "SyncThingy"
 
 class TrayIcon: public QSystemTrayIcon {
+
+public:
+    explicit TrayIcon(const QIcon& icon) : QSystemTrayIcon(icon) {
+        setupUi();
+        setupProcess();
+        setupTimer();
+    }
+
+    bool syncthingRunning() {
+        return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
+    }
+
+public slots:
+    void stopProcess() {
+        std::cout << "quit triggered \n";
+
+        if (syncthingRunning()) {
+            syncthingProcess->terminate();
+            syncthingProcess->waitForFinished();
+        }
+
+        QString msg = QString("exit code: ").append(QString::number(syncthingProcess->exitCode()));
+
+        if (syncthingProcess->exitCode() == 0)
+            showMessage("Syncthing stopped", msg, icon(), 5000);
+    };
 
 private:
     QTimer* timer;
@@ -30,7 +56,7 @@ private:
 
         connect(openGitHubAction, &QAction::triggered, this, &TrayIcon::showGitHub);
         connect(showBrowserAction, &QAction::triggered, this, &TrayIcon::showBrowser);
-        connect(exitAction, &QAction::triggered, this, &TrayIcon::quit);
+        connect(exitAction, &QAction::triggered, QApplication::instance(), &QApplication::quit);
         connect(this, &TrayIcon::activated, this, &TrayIcon::handleActivation);
 
         menu->addAction(openGitHubAction);
@@ -41,6 +67,7 @@ private:
         menu->addAction(exitAction);
 
         setContextMenu(menu);
+        show();
     }
 
     void setupProcess() {
@@ -92,36 +119,8 @@ private slots:
 
     void checkSyncthingRunning() {
         if (not syncthingRunning())
-            quit();
+            QApplication::quit();
     }
-
-public:
-    explicit TrayIcon(const QIcon& icon) : QSystemTrayIcon(icon) {
-        setupUi();
-        show();
-        setupProcess();
-        setupTimer();
-    }
-
-    bool syncthingRunning() {
-        return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
-    }
-
-public slots:
-    void quit() {
-        if (syncthingRunning()) {
-            syncthingProcess->terminate();
-            syncthingProcess->waitForFinished();
-        }
-
-        QString msg = QString("exit code: ").append(QString::number(syncthingProcess->exitCode()));
-
-        if (syncthingProcess->exitCode() == 0)
-            showMessage("Syncthing stopped", msg, icon(), 5000);
-
-        QApplication::quit();
-    };
-
 };
 
 int main(int argc, char *argv[]) {
@@ -138,6 +137,7 @@ int main(int argc, char *argv[]) {
         icon = QIcon::fromTheme(flatpakID);
     }
     TrayIcon tray(icon);
+    QObject::connect(&a, &QApplication::aboutToQuit, &tray, &TrayIcon::stopProcess);
 
     if (not tray.syncthingRunning())
         return 1;
