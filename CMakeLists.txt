@@ -21,4 +21,17 @@ target_link_libraries(${PROJECT_NAME}
         Qt5::Widgets
         )
 
+if (STATIC)
+    #Static start
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_SEARCH_START_STATIC 1)
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_SEARCH_END_STATIC 1)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a")
+    set(Qt5_USE_STATIC_LIBS ON)
+    set(Qt5_USE_STATIC_RUNTIME ON)
+    #Static Libs
+
+    #Set Linker flags
+    set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+endif()
+
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
