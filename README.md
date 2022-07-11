@@ -1,7 +1,7 @@
 # SyncThingy
 SyncThingy = Synthing + simple tray incidator
 
-![Screenshot1](screenshots/Screenshot_20220620_202001.png)
+![Screenshot1](screenshots/Screenshot_v3.png)
 
 [<img width="240px" src="https://flathub.org/assets/badges/flathub-badge-en.png" />](https://flathub.org/apps/details/com.github.zocker_160.SyncThingy)
 
