@@ -18,7 +18,7 @@
     
     <screenshots>
         <screenshot type="default">
-            <image>https://raw.githubusercontent.com/zocker-160/SyncThingy/master/screenshots/Screenshot_20220620_202001.png</image>
+            <image>https://raw.githubusercontent.com/zocker-160/SyncThingy/a538331348f0438c7b3ff0342c9cb32e6a8fe696/screenshots/Screenshot_v3.png</image>
         </screenshot>
     </screenshots>
     
@@ -27,6 +27,7 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="0.3" date="2022-07-11" />
         <release version="0.2" date="2022-06-22" />
         <release version="0.1" date="2022-06-20" />
     </releases>
