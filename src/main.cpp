@@ -73,15 +73,18 @@ private:
 
         auto openGitHubAction = new QAction(QString(APP_NAME).append(" ").append(VERSION), this);
         auto showBrowserAction = new QAction("Open WebUI", this);
+        auto openConfigAction = new QAction("Open Config", this);
         auto exitAction = new QAction("Exit", this);
         auto menu = new QMenu();
 
         openGitHubAction->setIcon(QIcon::fromTheme("help-about"));
         showBrowserAction->setIcon(QIcon::fromTheme("help-browser"));
+        openConfigAction->setIcon(QIcon::fromTheme("text"));
         exitAction->setIcon(QIcon::fromTheme("application-exit"));
 
         connect(openGitHubAction, &QAction::triggered, this, &TrayIcon::showGitHub);
         connect(showBrowserAction, &QAction::triggered, this, &TrayIcon::showBrowser);
+        connect(openConfigAction, &QAction::triggered, this, &TrayIcon::openConfig);
         connect(exitAction, &QAction::triggered, QApplication::instance(), &QApplication::quit);
         connect(this, &TrayIcon::activated, this, &TrayIcon::handleActivation);
 
@@ -89,6 +92,7 @@ private:
         menu->addSeparator();
         menu->addSeparator();
         menu->addAction(showBrowserAction);
+        menu->addAction(openConfigAction);
         menu->addSeparator();
         menu->addAction(exitAction);
 
@@ -139,6 +143,10 @@ private slots:
     void showBrowser() {
         system(QString("xdg-open ").append(settings->value("url").toString()).toStdString().c_str());
     };
+
+    void openConfig() {
+        system(QString("xdg-open ").append(settings->fileName()).toStdString().c_str());
+    }
 
     static void showGitHub() {
         system("xdg-open https://github.com/zocker-160/SyncThingy");
