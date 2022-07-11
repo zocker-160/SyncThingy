@@ -5,17 +5,23 @@
 #include <QProcess>
 #include <QStringList>
 #include <QTimer>
+#include <QSettings>
+
+#include <QDebug>
 
 #include <cstdlib>
 #include <iostream>
 
-#define VERSION "v0.2"
+#define VERSION "v0.3"
 #define APP_NAME "SyncThingy"
 
 class TrayIcon: public QSystemTrayIcon {
 
 public:
-    explicit TrayIcon(const QIcon& icon) : QSystemTrayIcon(icon) {
+    explicit TrayIcon() {
+        settings = new QSettings("SyncThingy", "settings");
+
+        initSettings();
         setupUi();
         setupProcess();
         setupTimer();
@@ -41,10 +47,30 @@ public slots:
     };
 
 private:
+    QSettings* settings;
     QTimer* timer;
     QProcess* syncthingProcess;
 
     void setupUi() {
+        const char* flatpakID = std::getenv("FLATPAK_ID");
+        QString prefix;
+
+        if (flatpakID == nullptr) {
+            prefix = "syncthing";
+        } else {
+            qDebug() << "running inside Flatpak \n";
+            prefix = flatpakID;
+        }
+
+        auto iconType = settings->value("icon").toString();
+        if (iconType == "white" or iconType == "black")
+            iconType = prefix + "." + iconType;
+        else
+            iconType = prefix;
+
+        qDebug() << "Using Icon:" << iconType;
+        setIcon(QIcon::fromTheme(iconType));
+
         auto openGitHubAction = new QAction(QString(APP_NAME).append(" ").append(VERSION), this);
         auto showBrowserAction = new QAction("Open WebUI", this);
         auto exitAction = new QAction("Exit", this);
@@ -96,14 +122,22 @@ private:
         timer->start(5000);
     }
 
+    void initSettings() {
+        if (not settings->contains("icon")) {
+            settings->setValue("url", "http://127.0.0.1:8384");
+            settings->setValue("icon", "default");
+            settings->sync();
+        }
+    }
+
     static bool checkSyncthingAvailable() {
         int ret = system("which syncthing");
         return ret == 0;
     }
 
 private slots:
-    static void showBrowser() {
-        system("xdg-open http://127.0.0.1:8384");
+    void showBrowser() {
+        system(QString("xdg-open ").append(settings->value("url").toString()).toStdString().c_str());
     };
 
     static void showGitHub() {
@@ -124,20 +158,13 @@ private slots:
 };
 
 int main(int argc, char *argv[]) {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
     QApplication::setApplicationName(APP_NAME);
     QApplication::setApplicationVersion(VERSION);
 
-    QIcon icon;
-    const char* flatpakID = std::getenv("FLATPAK_ID");
-    if (flatpakID == nullptr) {
-        icon = QIcon::fromTheme("syncthing");
-    } else {
-        std::cout << "running inside Flatpak \n";
-        icon = QIcon::fromTheme(flatpakID);
-    }
-    TrayIcon tray(icon);
-    QObject::connect(&a, &QApplication::aboutToQuit, &tray, &TrayIcon::stopProcess);
+    TrayIcon tray;
+
+    QObject::connect(&app, &QApplication::aboutToQuit, &tray, &TrayIcon::stopProcess);
 
     if (not tray.syncthingRunning())
         return 1;
