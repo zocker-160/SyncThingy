@@ -13,6 +13,13 @@ The answer is simple: there is currently no application available as Flatpak and
 
 Steam Deck users can thank me later.
 
+## Configuration
+
+Configuration file can be found under `~/.var/app/com.github.zocker_160.SyncThingy/config/SyncThingy`
+
+- `icon` can be set to `default`, `white` or `black`
+- `url` defines the link opened when selecting `Open WebUI`
+
 ## Compile from source
 
 **Build dependencies:**
