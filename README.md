@@ -26,6 +26,7 @@ Configuration file can be found under `~/.var/app/com.github.zocker_160.SyncThin
 
 - `build-essential`
 - `qt5-default` || `qtbase5-dev` `qtbase5-dev-tools`
+- `libportal-qt5-dev`
 
 ```bash
 git clone https://github.com/zocker-160/SyncThingy.git

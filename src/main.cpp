@@ -12,6 +12,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#include <libportal-qt5/portal-qt5.h>
+
 #define VERSION "v0.3"
 #define APP_NAME "SyncThingy"
 
@@ -25,13 +27,14 @@ public:
         setupUi();
         setupProcess();
         setupTimer();
+        requestBackgroundPermission();
     }
 
     bool syncthingRunning() {
         return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
     }
 
-public slots:
+//public slots:
     void stopProcess() {
         std::cout << "quit triggered \n";
 
@@ -134,12 +137,45 @@ private:
         }
     }
 
+    void requestBackgroundPermission() {
+        qDebug() << "requesting background permission";
+
+        auto commandline = g_ptr_array_new();
+        g_ptr_array_add(commandline, (gpointer) "SyncThingy");
+
+        char reason[] = "Ability to sync data in the background";
+
+        xdp_portal_request_background(
+            XdpQt::globalPortalObject(),
+            nullptr,
+            reason,
+            commandline,
+            XDP_BACKGROUND_FLAG_ACTIVATABLE,
+            nullptr,
+            TrayIcon::backgroundRequestCallback,
+            this
+        );
+    }
+
+    static void backgroundRequestCallback(GObject* object, GAsyncResult* result, void* data) {
+        GError* error = nullptr;
+        auto ret = xdp_portal_request_background_finish(
+                XdpQt::globalPortalObject(), result, &error);
+
+        auto tray = static_cast<TrayIcon*>(data);
+
+        if (ret)
+            tray->showMessage("Background permission granted", "", tray->icon(), 3000);
+        else
+            tray->showMessage("Background permission revoked", "", tray->icon(), 3000);
+    }
+
     static bool checkSyncthingAvailable() {
         int ret = system("which syncthing");
         return ret == 0;
     }
 
-private slots:
+//private slots:
     void showBrowser() {
         system(QString("xdg-open ").append(settings->value("url").toString()).toStdString().c_str());
     };

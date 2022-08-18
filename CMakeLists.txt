@@ -6,6 +6,13 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+# BS workaround for stupid Glib using "signals" for which QT uses as well
+add_definitions(-DQT_NO_KEYWORDS)
+
+find_package(PkgConfig REQUIRED)
+#pkg_check_modules(PORTAL REQUIRED IMPORTED_TARGET libportal)
+pkg_check_modules(PORTAL-QT REQUIRED IMPORTED_TARGET libportal-qt5)
+
 
 find_package(Qt5 COMPONENTS
         Core
@@ -19,7 +26,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
-        )
+        PkgConfig::PORTAL-QT)
 
 if (STATIC)
     #Static start
