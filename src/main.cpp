@@ -138,12 +138,12 @@ private:
     }
 
     void requestBackgroundPermission() {
-        qDebug() << "requesting background permission";
+        qDebug() << "Requesting background permission...";
 
         auto commandline = g_ptr_array_new();
         g_ptr_array_add(commandline, (gpointer) "SyncThingy");
 
-        char reason[] = "Ability to sync data in the background";
+        char reason[] = "Reason: Ability to sync data in the background.";
 
         xdp_portal_request_background(
             XdpQt::globalPortalObject(),
@@ -153,7 +153,7 @@ private:
             XDP_BACKGROUND_FLAG_AUTOSTART,
             nullptr,
             TrayIcon::backgroundRequestCallback,
-            this
+            nullptr
         );
     }
 
@@ -162,12 +162,10 @@ private:
         auto ret = xdp_portal_request_background_finish(
                 XdpQt::globalPortalObject(), result, &error);
 
-        auto tray = static_cast<TrayIcon*>(data);
-
         if (ret)
-            tray->showMessage("Background permission granted", "", tray->icon(), 3000);
+            qDebug() << "Background / Autostart permission granted";
         else
-            tray->showMessage("Background permission revoked", "", tray->icon(), 3000);
+            qDebug() << "Background / Autostart permission revoked";
     }
 
     static bool checkSyncthingAvailable() {
