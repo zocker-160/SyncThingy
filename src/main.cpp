@@ -14,7 +14,7 @@
 
 #include <libportal-qt5/portal-qt5.h>
 
-#define VERSION "v0.4"
+#define VERSION "v0.4.1"
 #define APP_NAME "SyncThingy"
 
 class TrayIcon: public QSystemTrayIcon {
@@ -159,7 +159,7 @@ private:
             flag,
             nullptr,
             TrayIcon::backgroundRequestCallback,
-            nullptr
+            this
         );
     }
 
@@ -168,10 +168,19 @@ private:
         auto ret = xdp_portal_request_background_finish(
                 XdpQt::globalPortalObject(), result, &error);
 
+        auto tray = static_cast<TrayIcon*>(data);
+
         if (ret)
             qDebug() << "Background / Autostart permission granted";
-        else
+        else {
             qDebug() << "Background / Autostart permission revoked";
+            tray->showMessage(
+                "Background permission revoked",
+                "SyncThingy might not work as expected!",
+                tray->icon(),
+                5000
+            );
+        }
     }
 
     static bool checkSyncthingAvailable() {
