@@ -150,7 +150,7 @@ private:
             nullptr,
             reason,
             commandline,
-            XDP_BACKGROUND_FLAG_ACTIVATABLE,
+            XDP_BACKGROUND_FLAG_AUTOSTART,
             nullptr,
             TrayIcon::backgroundRequestCallback,
             this
