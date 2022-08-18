@@ -14,7 +14,7 @@
 
 #include <libportal-qt5/portal-qt5.h>
 
-#define VERSION "v0.3"
+#define VERSION "v0.4"
 #define APP_NAME "SyncThingy"
 
 class TrayIcon: public QSystemTrayIcon {
