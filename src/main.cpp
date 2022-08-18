@@ -135,6 +135,11 @@ private:
             settings->setValue("icon", "default");
             settings->sync();
         }
+        // new setting in 0.4 which needs to be true by default
+        if (not settings->contains("autostart")) {
+            settings->setValue("autostart", true);
+            settings->sync();
+        }
     }
 
     void requestBackgroundPermission() {
@@ -144,13 +149,14 @@ private:
         g_ptr_array_add(commandline, (gpointer) "SyncThingy");
 
         char reason[] = "Reason: Ability to sync data in the background.";
+        auto flag = settings->value("autostart").toBool() ? XDP_BACKGROUND_FLAG_AUTOSTART : XDP_BACKGROUND_FLAG_NONE;
 
         xdp_portal_request_background(
             XdpQt::globalPortalObject(),
             nullptr,
             reason,
             commandline,
-            XDP_BACKGROUND_FLAG_AUTOSTART,
+            flag,
             nullptr,
             TrayIcon::backgroundRequestCallback,
             nullptr
