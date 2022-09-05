@@ -20,6 +20,7 @@ Configuration file can be found under `~/.var/app/com.github.zocker_160.SyncThin
 - `autostart` can be `true` or `false`
 - `icon` can be set to `default`, `white` or `black`
 - `url` defines the link opened when selecting `Open WebUI`
+- `notifications` can be `true` or `false`
 
 ## Compile from source
 

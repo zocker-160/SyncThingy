@@ -20,7 +20,7 @@ find_package(Qt5 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/SettingsDialog.cpp src/SettingsDialog.h src/Constants.h)
 
 target_link_libraries(${PROJECT_NAME}
         Qt5::Core

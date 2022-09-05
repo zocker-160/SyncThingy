@@ -14,15 +14,15 @@
 
 #include <libportal-qt5/portal-qt5.h>
 
-#define VERSION "v0.4.1"
+#include "SettingsDialog.h"
+
+#define VERSION "v0.5"
 #define APP_NAME "SyncThingy"
 
 class TrayIcon: public QSystemTrayIcon {
 
 public:
-    explicit TrayIcon() {
-        settings = new QSettings("SyncThingy", "settings");
-
+    explicit TrayIcon(QSettings& settings) : QSystemTrayIcon(), settings(settings) {
         initSettings();
         setupUi();
         setupProcess();
@@ -46,47 +46,33 @@ public:
         QString msg = QString("exit code: ").append(QString::number(syncthingProcess->exitCode()));
 
         if (syncthingProcess->exitCode() == 0)
-            showMessage("Syncthing stopped", msg, icon(), 5000);
+            _showMessage("Syncthing stopped", msg, icon(), 5000);
     };
 
 private:
-    QSettings* settings;
+    QSettings& settings;
     QTimer* timer;
     QProcess* syncthingProcess;
 
     void setupUi() {
-        const char* flatpakID = std::getenv("FLATPAK_ID");
-        QString prefix;
-
-        if (flatpakID == nullptr) {
-            prefix = "syncthing";
-        } else {
-            qDebug() << "running inside Flatpak \n";
-            prefix = flatpakID;
-        }
-
-        auto iconType = settings->value("icon").toString();
-        if (iconType == "white" or iconType == "black")
-            iconType = prefix + "." + iconType;
-        else
-            iconType = prefix;
-
-        qDebug() << "Using Icon:" << iconType;
-        setIcon(QIcon::fromTheme(iconType));
+        updateIcon();
 
         auto openGitHubAction = new QAction(QString(APP_NAME).append(" ").append(VERSION), this);
         auto showBrowserAction = new QAction("Open WebUI", this);
         auto openConfigAction = new QAction("Open Config", this);
+        auto openSettingsAction = new QAction("Settings...", this);
         auto exitAction = new QAction("Exit", this);
         auto menu = new QMenu();
 
         openGitHubAction->setIcon(QIcon::fromTheme("help-about"));
         showBrowserAction->setIcon(QIcon::fromTheme("help-browser"));
         openConfigAction->setIcon(QIcon::fromTheme("text"));
+        openSettingsAction->setIcon(QIcon::fromTheme("preferences-desktop-personal"));
         exitAction->setIcon(QIcon::fromTheme("application-exit"));
 
         connect(openGitHubAction, &QAction::triggered, this, &TrayIcon::showGitHub);
         connect(showBrowserAction, &QAction::triggered, this, &TrayIcon::showBrowser);
+        connect(openSettingsAction, &QAction::triggered, this, &TrayIcon::showSettingsDialog);
         connect(openConfigAction, &QAction::triggered, this, &TrayIcon::openConfig);
         connect(exitAction, &QAction::triggered, QApplication::instance(), &QApplication::quit);
         connect(this, &TrayIcon::activated, this, &TrayIcon::handleActivation);
@@ -95,7 +81,11 @@ private:
         menu->addSeparator();
         menu->addSeparator();
         menu->addAction(showBrowserAction);
-        menu->addAction(openConfigAction);
+        menu->addAction(openSettingsAction);
+
+        //menu->addSeparator();
+        //menu->addAction(openConfigAction);
+
         menu->addSeparator();
         menu->addAction(exitAction);
 
@@ -120,7 +110,7 @@ private:
         syncthingProcess->start("syncthing", arguments);
         syncthingProcess->waitForStarted();
 
-        showMessage("Syncthing started", "", icon(), 3000);
+        _showMessage("Syncthing started", "", icon(), 3000);
     }
 
     void setupTimer() {
@@ -129,16 +119,42 @@ private:
         timer->start(5000);
     }
 
+    void updateIcon() {
+        const char* flatpakID = std::getenv("FLATPAK_ID");
+        QString prefix;
+
+        if (flatpakID == nullptr) {
+            prefix = "syncthing";
+        } else {
+            qDebug() << "running inside Flatpak \n";
+            prefix = flatpakID;
+        }
+
+        QString iconType = settings.value("icon").toString();
+        if (iconType == "white" or iconType == "black")
+            iconType = prefix + "." + iconType;
+        else
+            iconType = prefix;
+
+        qDebug() << "Using Icon:" << iconType;
+        setIcon(QIcon::fromTheme(iconType));
+    }
+
     void initSettings() {
-        if (not settings->contains("icon")) {
-            settings->setValue("url", "http://127.0.0.1:8384");
-            settings->setValue("icon", "default");
-            settings->sync();
+        if (not settings.contains(C_URL)) {
+            settings.setValue(C_URL, "http://127.0.0.1:8384");
+            settings.setValue(C_ICON, "default");
+            settings.sync();
         }
         // new setting in 0.4 which needs to be true by default
-        if (not settings->contains("autostart")) {
-            settings->setValue("autostart", true);
-            settings->sync();
+        if (not settings.contains(C_AUTOSTART)) {
+            settings.setValue(C_AUTOSTART, true);
+            settings.sync();
+        }
+        // new setting in 0.5 which needs to be true by default
+        if (not settings.contains(C_NOTIFICATION)) {
+            settings.setValue(C_NOTIFICATION, true);
+            settings.sync();
         }
     }
 
@@ -149,7 +165,7 @@ private:
         g_ptr_array_add(commandline, (gpointer) "SyncThingy");
 
         char reason[] = "Reason: Ability to sync data in the background.";
-        auto flag = settings->value("autostart").toBool() ? XDP_BACKGROUND_FLAG_AUTOSTART : XDP_BACKGROUND_FLAG_NONE;
+        auto flag = settings.value(C_AUTOSTART).toBool() ? XDP_BACKGROUND_FLAG_AUTOSTART : XDP_BACKGROUND_FLAG_NONE;
 
         xdp_portal_request_background(
             XdpQt::globalPortalObject(),
@@ -190,11 +206,11 @@ private:
 
 //private slots:
     void showBrowser() {
-        system(QString("xdg-open ").append(settings->value("url").toString()).toStdString().c_str());
+        system(QString("xdg-open ").append(settings.value(C_URL).toString()).toStdString().c_str());
     };
 
     void openConfig() {
-        system(QString("xdg-open ").append(settings->fileName()).toStdString().c_str());
+        system(QString("xdg-open ").append(settings.fileName()).toStdString().c_str());
     }
 
     static void showGitHub() {
@@ -208,9 +224,24 @@ private:
         }
     }
 
+    void showSettingsDialog() {
+        qDebug() << "open settings";
+
+        SettingsDialog options(settings, icon());
+        if (options.exec() == QDialog::Accepted) {
+            updateIcon();
+            requestBackgroundPermission();
+        }
+    }
+
     void checkSyncthingRunning() {
         if (not syncthingRunning())
             QApplication::quit();
+    }
+
+    void _showMessage(const QString& title, const QString& msg, const QIcon& icon, int msecs = 10000) {
+        if (settings.value(C_NOTIFICATION).toBool())
+            showMessage(title, msg, icon, msecs);
     }
 };
 
@@ -219,7 +250,8 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationName(APP_NAME);
     QApplication::setApplicationVersion(VERSION);
 
-    TrayIcon tray;
+    QSettings settings(APP_NAME, "settings");
+    TrayIcon tray(settings);
 
     QObject::connect(&app, &QApplication::aboutToQuit, &tray, &TrayIcon::stopProcess);
 
