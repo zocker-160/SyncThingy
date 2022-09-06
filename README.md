@@ -38,8 +38,13 @@ make
 sudo make install (optional)
 ```
 
-### NOTE for non-Flatpak users
+### Note for non-Flatpak users
 
-You will need to have `syncthing` installed and available in $PATH, in order to make this work.
+You will need to have `syncthing` installed and available in `$PATH`, in order to make this work.
 
-Check out the [Syncthing Github page](https://github.com/syncthing/syncthing) for more information.
+**Running outside of Flatpak is not supported, you are on your own.**
+
+### Links
+
+- [Syncthing Github page](https://github.com/syncthing/syncthing)
+- [SyncThingy on Flathub](https://flathub.org/apps/details/com.github.zocker_160.SyncThingy)
