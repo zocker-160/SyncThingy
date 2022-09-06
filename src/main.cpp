@@ -194,7 +194,7 @@ private:
                 "Background permission revoked",
                 "SyncThingy might not work as expected!",
                 tray->icon(),
-                5000
+                0
             );
         }
     }
