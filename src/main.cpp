@@ -16,7 +16,7 @@
 
 #include "SettingsDialog.h"
 
-#define VERSION "v0.5"
+#define VERSION "v0.5.1"
 #define APP_NAME "SyncThingy"
 
 class TrayIcon: public QSystemTrayIcon {
