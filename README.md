@@ -1,5 +1,5 @@
 # SyncThingy
-SyncThingy = Synthing + simple tray incidator
+SyncThingy = Synthing + simple tray indicator
 
 ![Screenshot1](screenshots/Screenshot_v3.png)
 
