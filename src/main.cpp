@@ -36,7 +36,7 @@ public:
 
 //public slots:
     void stopProcess() {
-        std::cout << "quit triggered \n";
+        qDebug() << "quit triggered \n";
 
         if (syncthingRunning()) {
             syncthingProcess->terminate();
@@ -206,14 +206,17 @@ private:
 
 //private slots:
     void showBrowser() {
+        qDebug() << "opening Syncthing webui using xdg-open";
         system(QString("xdg-open ").append(settings.value(C_URL).toString()).toStdString().c_str());
     };
 
     void openConfig() {
+        qDebug() << "opening config file using xdg-open";
         system(QString("xdg-open ").append(settings.fileName()).toStdString().c_str());
     }
 
     static void showGitHub() {
+        qDebug() << "opening GitHub page using xdg-open";
         system("xdg-open https://github.com/zocker-160/SyncThingy");
     }
 
