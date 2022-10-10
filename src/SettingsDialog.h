@@ -1,7 +1,6 @@
 #ifndef SYNCTHINGY_SETTINGSDIALOG_H
 #define SYNCTHINGY_SETTINGSDIALOG_H
 
-#include <QDebug>
 #include <QWidget>
 #include <QDialog>
 #include <QSettings>
@@ -18,12 +17,14 @@
 
 #include <QDialogButtonBox>
 
+#include <QDebug>
+
 #include "Constants.h"
 
 class SettingsDialog : public QDialog {
 
 public:
-    explicit SettingsDialog(QSettings& settings, const QIcon& icon);
+    explicit SettingsDialog(QSettings& settings, const QIcon& icon, QWidget* parent = nullptr);
 
 private:
     QSettings& settings;
