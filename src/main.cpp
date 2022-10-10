@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDialog>
 #include <QSystemTrayIcon>
 #include <QAction>
 #include <QMenu>
@@ -6,6 +7,7 @@
 #include <QStringList>
 #include <QTimer>
 #include <QSettings>
+#include <QSemaphore>
 
 #include <QDebug>
 
@@ -16,14 +18,15 @@
 
 #include "SettingsDialog.h"
 
-#define VERSION "v0.5.1"
+#define VERSION "v0.5.2"
 #define APP_NAME "SyncThingy"
 
-class TrayIcon: public QSystemTrayIcon {
+class SyncThingy : public QDialog {
 
 public:
-    explicit TrayIcon(QSettings& settings) : QSystemTrayIcon(), settings(settings) {
+    explicit SyncThingy(QSettings& settings) : settings(settings) {
         initSettings();
+        workaroundFuckingStupidGTKbug();
         setupUi();
         setupProcess();
         setupTimer();
@@ -46,13 +49,22 @@ public:
         QString msg = QString("exit code: ").append(QString::number(syncthingProcess->exitCode()));
 
         if (syncthingProcess->exitCode() == 0)
-            _showMessage("Syncthing stopped", msg, icon(), 5000);
+            _showMessage("Syncthing stopped", msg, trayIcon->icon(), 5000);
     };
 
 private:
     QSettings& settings;
     QTimer* timer;
     QProcess* syncthingProcess;
+
+    QSemaphore* semaphore = new QSemaphore(1);
+    QSystemTrayIcon* trayIcon = new QSystemTrayIcon(this);
+
+    void workaroundFuckingStupidGTKbug() {
+        // Yes I know this ridiculously stupid, but I have to work around a stupid GTK / GNOME bug
+        // see https://github.com/zocker-160/SyncThingy/issues/8
+        resize(0, 0);
+    }
 
     void setupUi() {
         updateIcon();
@@ -70,12 +82,12 @@ private:
         openSettingsAction->setIcon(QIcon::fromTheme("preferences-desktop-personal"));
         exitAction->setIcon(QIcon::fromTheme("application-exit"));
 
-        connect(openGitHubAction, &QAction::triggered, this, &TrayIcon::showGitHub);
-        connect(showBrowserAction, &QAction::triggered, this, &TrayIcon::showBrowser);
-        connect(openSettingsAction, &QAction::triggered, this, &TrayIcon::showSettingsDialog);
-        connect(openConfigAction, &QAction::triggered, this, &TrayIcon::openConfig);
+        connect(openGitHubAction, &QAction::triggered, this, &SyncThingy::showGitHub);
+        connect(showBrowserAction, &QAction::triggered, this, &SyncThingy::showBrowser);
+        connect(openSettingsAction, &QAction::triggered, this, &SyncThingy::showSettingsDialog);
+        connect(openConfigAction, &QAction::triggered, this, &SyncThingy::openConfig);
         connect(exitAction, &QAction::triggered, QApplication::instance(), &QApplication::quit);
-        connect(this, &TrayIcon::activated, this, &TrayIcon::handleActivation);
+        connect(trayIcon, &QSystemTrayIcon::activated, this, &SyncThingy::handleActivation);
 
         menu->addAction(openGitHubAction);
         menu->addSeparator();
@@ -89,8 +101,8 @@ private:
         menu->addSeparator();
         menu->addAction(exitAction);
 
-        setContextMenu(menu);
-        show();
+        trayIcon->setContextMenu(menu);
+        trayIcon->show();
     }
 
     void setupProcess() {
@@ -98,7 +110,7 @@ private:
             const char* msg = "Syncthing could not be found in PATH!";
 
             std::cout << "ERROR: "<< msg << std::endl;
-            showMessage("ERROR", msg, QSystemTrayIcon::Critical, 0);
+            trayIcon->showMessage("ERROR", msg, QSystemTrayIcon::Critical, 0);
 
             return;
         }
@@ -110,12 +122,12 @@ private:
         syncthingProcess->start("syncthing", arguments);
         syncthingProcess->waitForStarted();
 
-        _showMessage("Syncthing started", "", icon(), 3000);
+        _showMessage("Syncthing started", "", trayIcon->icon(), 3000);
     }
 
     void setupTimer() {
         timer = new QTimer(this);
-        connect(timer, &QTimer::timeout, this, &TrayIcon::checkSyncthingRunning);
+        connect(timer, &QTimer::timeout, this, &SyncThingy::checkSyncthingRunning);
         timer->start(5000);
     }
 
@@ -137,7 +149,7 @@ private:
             iconType = prefix;
 
         qDebug() << "Using Icon:" << iconType;
-        setIcon(QIcon::fromTheme(iconType));
+        trayIcon->setIcon(QIcon::fromTheme(iconType));
     }
 
     void initSettings() {
@@ -174,7 +186,7 @@ private:
             commandline,
             flag,
             nullptr,
-            TrayIcon::backgroundRequestCallback,
+            SyncThingy::backgroundRequestCallback,
             this
         );
     }
@@ -184,16 +196,16 @@ private:
         auto ret = xdp_portal_request_background_finish(
                 XdpQt::globalPortalObject(), result, &error);
 
-        auto tray = static_cast<TrayIcon*>(data);
+        auto tray = static_cast<SyncThingy*>(data);
 
         if (ret)
             qDebug() << "Background / Autostart permission granted";
         else {
             qDebug() << "Background / Autostart permission revoked";
-            tray->showMessage(
+            tray->trayIcon->showMessage(
                 "Background permission revoked",
                 "SyncThingy might not work as expected!",
-                tray->icon(),
+                tray->trayIcon->icon(),
                 0
             );
         }
@@ -228,12 +240,21 @@ private:
     }
 
     void showSettingsDialog() {
-        qDebug() << "open settings";
+        if (semaphore->tryAcquire()) {
+            show(); // see workaroundFuckingStupidGTKbug()
 
-        SettingsDialog options(settings, icon());
-        if (options.exec() == QDialog::Accepted) {
-            updateIcon();
-            requestBackgroundPermission();
+            qDebug() << "open settings";
+
+            SettingsDialog options(settings, trayIcon->icon(), this);
+            if (options.exec() == QDialog::Accepted) {
+                updateIcon();
+                requestBackgroundPermission();
+            }
+
+            hide(); // see workaroundFuckingStupidGTKbug()
+            semaphore->release();
+        } else {
+            qDebug() << "settings dialog is already open";
         }
     }
 
@@ -244,7 +265,7 @@ private:
 
     void _showMessage(const QString& title, const QString& msg, const QIcon& icon, int msecs = 10000) {
         if (settings.value(C_NOTIFICATION).toBool())
-            showMessage(title, msg, icon, msecs);
+            trayIcon->showMessage(title, msg, icon, msecs);
     }
 };
 
@@ -254,11 +275,11 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationVersion(VERSION);
 
     QSettings settings(APP_NAME, "settings");
-    TrayIcon tray(settings);
+    SyncThingy sth(settings);
 
-    QObject::connect(&app, &QApplication::aboutToQuit, &tray, &TrayIcon::stopProcess);
+    QObject::connect(&app, &QApplication::aboutToQuit, &sth, &SyncThingy::stopProcess);
 
-    if (not tray.syncthingRunning())
+    if (not sth.syncthingRunning())
         return 1;
 
     return QApplication::exec();

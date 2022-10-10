@@ -1,7 +1,7 @@
 
 #include "SettingsDialog.h"
 
-SettingsDialog::SettingsDialog(QSettings& settings, const QIcon& icon) : QDialog(), settings(settings) {
+SettingsDialog::SettingsDialog(QSettings& settings, const QIcon& icon, QWidget* parent) : QDialog(parent), settings(settings) {
     setupUi(icon);
     loadSettings();
 }
