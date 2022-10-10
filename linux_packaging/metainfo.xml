@@ -4,29 +4,39 @@
     <id>com.github.zocker_160.SyncThingy</id>
     <metadata_license>CC0-1.0</metadata_license>
     <project_license>GPL-3.0</project_license>
-	<content_rating type="oars-1.1" />
+    <content_rating type="oars-1.1" />
 
     <name>SyncThingy</name>
     <developer_name>zocker_160</developer_name>
     <summary>SyncThingy = Synthing + simple tray indicator</summary>
-	<description>
-        <p>SyncThingy is a very simple and basic tray indicator for Syncthing written in C++.</p>
+    <description>
+        <p>SyncThingy is a simple tray indicator for Syncthing written in C++.</p>
         <p>
-        It allows you to see if Syncthing is running, stop it and manage it using the default webui.
+        Following the KISS principle, it allows you to see if Syncthing is running, stop it and manage it using the default webui.
         </p>
     </description>
-    
+
     <screenshots>
         <screenshot type="default">
             <image>https://raw.githubusercontent.com/zocker-160/SyncThingy/3d016cc6588137085a208247a4f6743e67bba734/screenshots/Screenshot_v3_flhub.png</image>
         </screenshot>
     </screenshots>
-    
+
     <url type="homepage">https://github.com/zocker-160/SyncThingy</url>
     <url type="bugtracker">https://github.com/zocker-160/SyncThingy/issues</url>
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="0.5.3" date="2022-10-10">
+            <description>
+                <ul>
+                <li>worked around broken behavior on GTK / GNOME based desktop environments (thanks to @SashaPGT for reporting)</li>
+                <li>improved logging in terminal</li>
+                <li>minor code improvements</li>
+                </ul>
+            </description>
+        </release>
+        <release version="0.5.2" date="2022-10-10" />
         <release version="0.5.1" date="2022-09-06" />
         <release version="0.5" date="2022-09-05" />
         <release version="0.4.1" date="2022-08-19" />
