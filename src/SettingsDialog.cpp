@@ -28,9 +28,9 @@ void SettingsDialog::setupUi(const QIcon& icon) {
 
     auto iconLabel = new QLabel("Icon:", this);
     iconBox = new QComboBox(this);
-    iconBox->addItem("color");
-    iconBox->addItem("white");
-    iconBox->addItem("black");
+    iconBox->addItem(C_ICON_COLOR);
+    iconBox->addItem(C_ICON_WHITE);
+    iconBox->addItem(C_ICON_BLACK);
     iconLayout->addWidget(iconLabel);
     iconLayout->addWidget(iconBox);
 

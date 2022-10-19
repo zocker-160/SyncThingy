@@ -18,7 +18,7 @@
 
 #include "SettingsDialog.h"
 
-#define VERSION "v0.5.3"
+#define VERSION "v0.5.4"
 #define APP_NAME "SyncThingy"
 
 class SyncThingy : public QDialog {
@@ -142,8 +142,8 @@ private:
             prefix = flatpakID;
         }
 
-        QString iconType = settings.value("icon").toString();
-        if (iconType == "white" or iconType == "black")
+        QString iconType = settings.value(C_ICON).toString();
+        if (iconType == C_ICON_WHITE or iconType == C_ICON_BLACK)
             iconType = prefix + "." + iconType;
         else
             iconType = prefix;
