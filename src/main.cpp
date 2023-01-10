@@ -16,6 +16,7 @@
 
 #include <libportal-qt5/portal-qt5.h>
 
+#include <SingleApplication>
 #include "SettingsDialog.h"
 
 #define VERSION "v0.5.4"
@@ -55,8 +56,15 @@ public:
             const auto msg = QString("Syncthing failed to start! exit code (").append(sExitCode).append(")");
             trayIcon->showMessage("ERROR", msg, QSystemTrayIcon::Critical, 0);
         }
-
     };
+
+    void secondaryStarted() {
+        qDebug() << "Secondary SyncThingy instance started!!";
+
+        _showMessage("LEL", "SEC STARTED", trayIcon->icon(), 0);
+
+        trayIcon->show();
+    }
 
 private:
     QSettings& settings;
@@ -276,17 +284,18 @@ private:
 };
 
 int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);
-    QApplication::setApplicationName(APP_NAME);
-    QApplication::setApplicationVersion(VERSION);
+    SingleApplication app(argc, argv);
+    SingleApplication::setApplicationName(APP_NAME);
+    SingleApplication::setApplicationVersion(VERSION);
 
     QSettings settings(APP_NAME, "settings");
     SyncThingy sth(settings);
 
-    QObject::connect(&app, &QApplication::aboutToQuit, &sth, &SyncThingy::stopProcess);
+    QObject::connect(&app, &SingleApplication::aboutToQuit, &sth, &SyncThingy::stopProcess);
+    QObject::connect(&app, &SingleApplication::instanceStarted, &sth, &SyncThingy::secondaryStarted);
 
     if (not sth.syncthingRunning())
         return 1;
 
-    return QApplication::exec();
+    return SingleApplication::exec();
 }
