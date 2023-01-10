@@ -284,9 +284,14 @@ private:
 };
 
 int main(int argc, char *argv[]) {
-    SingleApplication app(argc, argv);
+    SingleApplication app(argc, argv, true);
     SingleApplication::setApplicationName(APP_NAME);
     SingleApplication::setApplicationVersion(VERSION);
+
+    if (app.isSecondary()) {
+        qDebug() << "secondary instance started";
+        return 4;
+    }
 
     QSettings settings(APP_NAME, "settings");
     SyncThingy sth(settings);
