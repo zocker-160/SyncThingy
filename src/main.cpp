@@ -46,10 +46,16 @@ public:
             syncthingProcess->waitForFinished();
         }
 
-        QString msg = QString("exit code: ").append(QString::number(syncthingProcess->exitCode()));
+        const auto sExitCode = QString::number(syncthingProcess->exitCode());
 
-        if (syncthingProcess->exitCode() == 0)
+        if (syncthingProcess->exitCode() == 0) {
+            const auto msg = QString("exit code: ").append(sExitCode);
             _showMessage("Syncthing stopped", msg, trayIcon->icon(), 5000);
+        } else {
+            const auto msg = QString("Syncthing failed to start! exit code (").append(sExitCode).append(")");
+            trayIcon->showMessage("ERROR", msg, QSystemTrayIcon::Critical, 0);
+        }
+
     };
 
 private:
