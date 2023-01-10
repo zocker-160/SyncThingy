@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 
 # BS workaround for stupid Glib using "signals" for which QT uses as well
 add_definitions(-DQT_NO_KEYWORDS)
@@ -13,7 +14,6 @@ find_package(PkgConfig REQUIRED)
 #pkg_check_modules(PORTAL REQUIRED IMPORTED_TARGET libportal)
 pkg_check_modules(PORTAL-QT REQUIRED IMPORTED_TARGET libportal-qt5)
 
-
 find_package(Qt5 COMPONENTS
         Core
         Gui
@@ -21,12 +21,14 @@ find_package(Qt5 COMPONENTS
         REQUIRED)
 
 add_executable(${PROJECT_NAME} src/main.cpp src/SettingsDialog.cpp src/SettingsDialog.h src/Constants.h)
+add_subdirectory(src/singleapplication)
 
 target_link_libraries(${PROJECT_NAME}
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets
-        PkgConfig::PORTAL-QT)
+        PkgConfig::PORTAL-QT
+        SingleApplication::SingleApplication)
 
 if (STATIC)
     #Static start
