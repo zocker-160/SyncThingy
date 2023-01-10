@@ -14,12 +14,14 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QIcon>
+#include <QPushButton>
 
 #include <QDialogButtonBox>
 
 #include <QDebug>
 
 #include "Constants.h"
+#include "ServiceDialog.h"
 
 class SettingsDialog : public QDialog {
 
@@ -32,12 +34,15 @@ private:
     QComboBox* iconBox;
     QCheckBox* autostartBox;
     QCheckBox* notificationBox;
+    QPushButton* createBGService;
 
     void setupUi(const QIcon& icon);
     void loadSettings();
     void saveSettings();
 
     void accept() override;
+
+    void showServiceDialog();
 };
 
 

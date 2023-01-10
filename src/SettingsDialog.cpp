@@ -34,18 +34,22 @@ void SettingsDialog::setupUi(const QIcon& icon) {
     iconLayout->addWidget(iconLabel);
     iconLayout->addWidget(iconBox);
 
-    autostartBox = new QCheckBox("autostart", this);
+    autostartBox = new QCheckBox("autostart on login", this);
     notificationBox = new QCheckBox("disable notifications", this);
 
-    auto confirmButtons = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+    createBGService = new QPushButton("install as system service", this);
+
+    auto confirmButtons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
 
     mainLayout->addWidget(title);
     mainLayout->addLayout(urlLayout);
     mainLayout->addLayout(iconLayout);
     mainLayout->addWidget(autostartBox);
     mainLayout->addWidget(notificationBox);
+    mainLayout->addWidget(createBGService);
     mainLayout->addWidget(confirmButtons);
 
+    connect(createBGService, &QPushButton::clicked, this, &SettingsDialog::showServiceDialog);
     connect(confirmButtons, &QDialogButtonBox::accepted, this, &QDialog::accept);
     connect(confirmButtons, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
@@ -71,4 +75,9 @@ void SettingsDialog::saveSettings() {
 void SettingsDialog::accept() {
     saveSettings();
     QDialog::accept();
+}
+
+void SettingsDialog::showServiceDialog() {
+    const auto serviceDialog = new ServiceDialog(this);
+    serviceDialog->show();
 }
