@@ -289,7 +289,7 @@ int main(int argc, char *argv[]) {
     SingleApplication::setApplicationVersion(VERSION);
 
     if (app.isSecondary()) {
-        qDebug() << "secondary instance started";
+        qDebug() << "this instance is secondary, exiting with 4";
         return 4;
     }
 
