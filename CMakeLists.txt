@@ -20,7 +20,12 @@ find_package(Qt5 COMPONENTS
         Widgets
         REQUIRED)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/SettingsDialog.cpp src/SettingsDialog.h src/Constants.h)
+add_executable(${PROJECT_NAME}
+        src/main.cpp
+        src/Constants.h
+        src/SettingsDialog.cpp src/SettingsDialog.h
+        src/ServiceDialog.cpp src/ServiceDialog.h)
+
 add_subdirectory(src/singleapplication)
 
 target_link_libraries(${PROJECT_NAME}
