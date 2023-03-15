@@ -11,8 +11,6 @@ Why yet another Syncthing tray / statusbar / wrapper / ui ... application?
 
 The answer is simple: there is currently no application available as Flatpak and on Flathub, which offers just the bare minimum: Syncthing and a tray icon.
 
-Steam Deck users can thank me later.
-
 ## Configuration
 
 Configuration file can be found under `~/.var/app/com.github.zocker_160.SyncThingy/config/SyncThingy`
@@ -32,6 +30,7 @@ Configuration file can be found under `~/.var/app/com.github.zocker_160.SyncThin
 
 ```bash
 git clone https://github.com/zocker-160/SyncThingy.git
+cd SyncThingy
 cmake -S . -B out
 cd out
 make
