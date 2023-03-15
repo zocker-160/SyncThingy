@@ -39,26 +39,28 @@ public:
         requestBackgroundPermission();
     }
 
-    bool syncthingProcessRunning() {
-        return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
-    }
-
 //public slots:
     void stopProcess() {
         qDebug() << "quit triggered \n";
 
+        if (syncthingProcess == nullptr)
+            return;
+
         if (syncthingProcessRunning()) {
             syncthingProcess->terminate();
             syncthingProcess->waitForFinished();
-            auto exitcode = syncthingProcess->exitCode();
+        }
 
-            if (exitcode == 0) {
-                const auto msg = QString("exit code: ").append(exitcode);
-                _showMessage("Syncthing stopped", msg, trayIcon->icon(), 5000);
-            } else {
-                const auto msg = QString("Syncthing failed to start! exit code (").append(exitcode).append(")");
-                trayIcon->showMessage("ERROR", msg, QSystemTrayIcon::Critical, 0);
-            }
+        int exitcode = syncthingProcess->exitCode();
+
+        if (exitcode == 0) {
+            const auto msg = QString("exit code: ").append(exitcode);
+            _showMessage("Syncthing stopped", msg, trayIcon->icon(), 5000);
+        } else {
+            const auto msg = QString("Syncthing failed to start! exit code (")
+                    .append(QString::number(exitcode))
+                    .append(")");
+            trayIcon->showMessage("ERROR", msg, QSystemTrayIcon::Critical, 0);
         }
     };
 
@@ -173,7 +175,7 @@ private:
         syncthingProcess->start("syncthing", arguments);
         syncthingProcess->waitForStarted();
 
-        _showMessage("Syncthing started", "", trayIcon->icon(), 3000);
+        _showMessage("SyncThingy started", "", trayIcon->icon(), 3000);
     }
 
     void setupTimer() {
@@ -262,6 +264,24 @@ private:
         }
     }
 
+    bool syncthingProcessRunning() {
+        return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
+    }
+
+    void checkSyncthingRunning() {
+        //qDebug() << "run check";
+
+        if (not syncthingProcessRunning()) {
+            auto reply = _requestSyncthingHealth();
+            connect(reply, &QNetworkReply::finished, [=] {
+                if (not _isSyncthingRunning(reply))
+                    QApplication::quit();
+                else
+                    reply->deleteLater();
+            });
+        }
+    }
+
     static bool checkSyncthingAvailable() {
         int ret = system("which syncthing");
         return ret == 0;
@@ -306,20 +326,6 @@ private:
             semaphore->release();
         } else {
             qDebug() << "settings dialog is already open";
-        }
-    }
-
-    void checkSyncthingRunning() {
-        //qDebug() << "run check";
-
-        if (not syncthingProcessRunning()) {
-            auto reply = _requestSyncthingHealth();
-            connect(reply, &QNetworkReply::finished, [=] {
-                if (not _isSyncthingRunning(reply))
-                    QApplication::quit();
-                else
-                    reply->deleteLater();
-            });
         }
     }
 
