@@ -54,7 +54,7 @@ public:
         int exitcode = syncthingProcess->exitCode();
 
         if (exitcode == 0) {
-            const auto msg = QString("exit code: ").append(exitcode);
+            const auto msg = QString("exit code (0)");
             _showMessage("Syncthing stopped", msg, trayIcon->icon(), 5000);
         } else {
             const auto msg = QString("Syncthing failed to start! exit code (")
