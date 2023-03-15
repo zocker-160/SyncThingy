@@ -11,6 +11,12 @@
 
 #include <QDebug>
 
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+
 #include <cstdlib>
 #include <iostream>
 
@@ -29,12 +35,11 @@ public:
         initSettings();
         workaroundFuckingStupidGTKbug();
         setupUi();
-        setupProcess();
-        setupTimer();
+        checkRunning();
         requestBackgroundPermission();
     }
 
-    bool syncthingRunning() {
+    bool syncthingProcessRunning() {
         return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
     }
 
@@ -42,37 +47,36 @@ public:
     void stopProcess() {
         qDebug() << "quit triggered \n";
 
-        if (syncthingRunning()) {
+        if (syncthingProcessRunning()) {
             syncthingProcess->terminate();
             syncthingProcess->waitForFinished();
-        }
+            auto exitcode = syncthingProcess->exitCode();
 
-        const auto sExitCode = QString::number(syncthingProcess->exitCode());
-
-        if (syncthingProcess->exitCode() == 0) {
-            const auto msg = QString("exit code: ").append(sExitCode);
-            _showMessage("Syncthing stopped", msg, trayIcon->icon(), 5000);
-        } else {
-            const auto msg = QString("Syncthing failed to start! exit code (").append(sExitCode).append(")");
-            trayIcon->showMessage("ERROR", msg, QSystemTrayIcon::Critical, 0);
+            if (exitcode == 0) {
+                const auto msg = QString("exit code: ").append(exitcode);
+                _showMessage("Syncthing stopped", msg, trayIcon->icon(), 5000);
+            } else {
+                const auto msg = QString("Syncthing failed to start! exit code (").append(exitcode).append(")");
+                trayIcon->showMessage("ERROR", msg, QSystemTrayIcon::Critical, 0);
+            }
         }
     };
 
-    void secondaryStarted() {
+    static void secondaryStarted() {
         qDebug() << "Secondary SyncThingy instance started!!";
-
-        _showMessage("LEL", "SEC STARTED", trayIcon->icon(), 0);
-
-        trayIcon->show();
+        //_showMessage("INFO", "SEC STARTED", trayIcon->icon(), 0);
+        //trayIcon->show();
     }
 
 private:
     QSettings& settings;
     QTimer* timer;
-    QProcess* syncthingProcess;
+    QProcess* syncthingProcess = nullptr;
 
     QSemaphore* semaphore = new QSemaphore(1);
     QSystemTrayIcon* trayIcon = new QSystemTrayIcon(this);
+
+    QNetworkAccessManager networkManager;
 
     void workaroundFuckingStupidGTKbug() {
         // Yes I know this ridiculously stupid, but I have to work around a stupid GTK / GNOME bug
@@ -117,6 +121,39 @@ private:
 
         trayIcon->setContextMenu(menu);
         trayIcon->show();
+    }
+
+    QNetworkReply* _requestSyncthingHealth() {
+        const auto pingEndpoint = QString(settings.value(C_URL).toString()).append("/rest/noauth/health");
+        QNetworkRequest request(pingEndpoint);
+        request.setRawHeader("Content-Type", "application/json; charset=utf-8");
+        request.setRawHeader("Accept", "application/json");
+
+        return networkManager.get(request);
+    }
+
+    static bool _isSyncthingRunning(QNetworkReply* reply) {
+        auto jsonDoc = QJsonDocument::fromJson(reply->readAll());
+        auto status = jsonDoc.object().value("status");
+
+        if (not status.isUndefined() && status.toString() == "OK")
+            return true;
+        else
+            return false;
+    }
+
+    void checkRunning() {
+        auto reply = _requestSyncthingHealth();
+        connect(reply, &QNetworkReply::finished, [=]{
+            if (_isSyncthingRunning(reply)) {
+                qDebug() << "Syncthing instance seems to be already running, Tray Icon only";
+            } else {
+                qDebug() << "Syncthing does not seem to be running, starting own instance";
+                setupProcess();
+            }
+            setupTimer();
+            reply->deleteLater();
+        });
     }
 
     void setupProcess() {
@@ -273,8 +310,17 @@ private:
     }
 
     void checkSyncthingRunning() {
-        if (not syncthingRunning())
-            QApplication::quit();
+        //qDebug() << "run check";
+
+        if (not syncthingProcessRunning()) {
+            auto reply = _requestSyncthingHealth();
+            connect(reply, &QNetworkReply::finished, [=] {
+                if (not _isSyncthingRunning(reply))
+                    QApplication::quit();
+                else
+                    reply->deleteLater();
+            });
+        }
     }
 
     void _showMessage(const QString& title, const QString& msg, const QIcon& icon, int msecs = 10000) {
@@ -298,9 +344,6 @@ int main(int argc, char *argv[]) {
 
     QObject::connect(&app, &SingleApplication::aboutToQuit, &sth, &SyncThingy::stopProcess);
     QObject::connect(&app, &SingleApplication::instanceStarted, &sth, &SyncThingy::secondaryStarted);
-
-    if (not sth.syncthingRunning())
-        return 1;
 
     return SingleApplication::exec();
 }
