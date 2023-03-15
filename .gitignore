@@ -12,11 +12,10 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-#
-
 .directory
 .idea
 
 cmake-*
 build*
 
+linux_packaging/com.github*
