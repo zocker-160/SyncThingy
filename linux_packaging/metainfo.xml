@@ -27,13 +27,14 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
-        <release version="0.6" date="2023-03-15">
+        <release version="0.6" date="2023-03-16">
             <description>
                 <ul>
                     <li>SyncThingy can now be installed as a background service primarily targeted at SteamDeck users</li>
                     <li>SyncThingy will keep running also when any syncthing instance is running on the specified port (even outside of the Flatpak)</li>
                     <li>Add new option in settings for creating, installing and enabling the systemd unit file</li>
                     <li>Add detection to make sure only one instance of SyncThingy is running</li>
+                    <li>Add help button to system service dialog, because why not</li>
                     <li>Improve wording of some error and popup messages</li>
                 </ul>
             </description>
