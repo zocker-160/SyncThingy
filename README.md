@@ -33,6 +33,7 @@ It does not really make much sense to use this on a normal Linux Desktop.
 - open terminal (`konsole` on Steam Deck)
 - paste the command and hit enter (press `paste` in the top right on Steam Deck)
 - (Steam Deck) open virtual keyboard with `STEAM` + `X` and press `R2` or `Enter` button
+- reboot
 
 ## Compile from source
 
