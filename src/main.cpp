@@ -300,7 +300,7 @@ private:
 
     static void showGitHub() {
         qDebug() << "opening GitHub page using xdg-open";
-        system("xdg-open https://github.com/zocker-160/SyncThingy");
+        system(QString("xdg-open ").append(C_GITHUB).toStdString().c_str());
     }
 
     void handleActivation(QSystemTrayIcon::ActivationReason reason) {

@@ -20,6 +20,7 @@ ServiceDialog::ServiceDialog(QWidget *parent) : QDialog(parent) {
 
 void ServiceDialog::setupUi() {
     auto mainLayout = new QVBoxLayout(this);
+    auto lowerRow = new QHBoxLayout();
 
     title = new QLabel(installTitle, this);
     title->setMaximumHeight(30);
@@ -30,22 +31,26 @@ void ServiceDialog::setupUi() {
     installCommandTextbox->setStyleSheet("color: white; background-color: black;");
 
     copyToClipboardBtn = new QPushButton(QIcon::fromTheme("document-save"), "copy to clipboard", this);
-    //helpINeedMommy = new QPushButton(QIcon::fromTheme("help-browser"), "help, I have no idea what to do!", this);
+    helpINeedMommy = new QPushButton(QIcon::fromTheme("help-browser"), "HELP, I have no idea what to do!", this);
 
     showUninstall = new QCheckBox("show uninstall command", this);
 
-    auto confirmButtons = new QDialogButtonBox(QDialogButtonBox::Ok);
+    auto confirmButtons = new QDialogButtonBox(QDialogButtonBox::Close);
+
+    lowerRow->addWidget(helpINeedMommy);
+    lowerRow->addWidget(confirmButtons);
 
     mainLayout->addWidget(title);
     mainLayout->addWidget(installCommandTextbox);
     mainLayout->addWidget(copyToClipboardBtn);
-    //mainLayout->addWidget(helpINeedMommy);
     mainLayout->addWidget(showUninstall);
-    mainLayout->addWidget(confirmButtons);
+    mainLayout->addLayout(lowerRow);
 
     connect(copyToClipboardBtn, &QPushButton::clicked, this, &ServiceDialog::copyToClipboard);
     connect(showUninstall, &QCheckBox::stateChanged, this, &ServiceDialog::toggleCommandContent);
-    connect(confirmButtons, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(helpINeedMommy, &QPushButton::clicked, this, &ServiceDialog::openHelpPage);
+    connect(confirmButtons, &QDialogButtonBox::helpRequested, this, &ServiceDialog::openHelpPage);
+    connect(confirmButtons, &QDialogButtonBox::clicked, this, &QDialog::accept);
 }
 
 void ServiceDialog::copyToClipboard() {
@@ -70,4 +75,9 @@ void ServiceDialog::toggleCommandContent() {
         title->setText(installTitle);
         installCommandTextbox->setText(systemdInstallCommand);
     }
+}
+
+void ServiceDialog::openHelpPage() {
+    qDebug() << "opening Syncthing help page using xdg-open";
+    system(QString("xdg-open ").append(C_GITHUB_HELP).toStdString().c_str());
 }

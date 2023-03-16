@@ -26,6 +26,8 @@
 
 #include <SingleApplication>
 
+#include "Constants.h"
+
 class ServiceDialog : public QDialog {
 public:
     explicit ServiceDialog(QWidget* parent = nullptr);
@@ -40,6 +42,8 @@ private:
     void setupUi();
     void copyToClipboard();
     void toggleCommandContent();
+
+    void openHelpPage();
 };
 
 
