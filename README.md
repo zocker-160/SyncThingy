@@ -20,6 +20,20 @@ Configuration file can be found under `~/.var/app/com.github.zocker_160.SyncThin
 - `url` defines the link opened when selecting `Open WebUI`
 - `notifications` can be `true` or `false`
 
+## Install background service
+
+**Note**: this feature is mainly targeted at Steam Deck users, that want to have it running in the background when in Gaming Mode.
+It does not really make much sense to use this on a normal Linux Desktop.
+
+- (Steam Deck) switch to Desktop Mode
+- right-click the SyncThiny icon in the system tray
+- select `Settings`
+- press `install as system service` button
+- press `copy to clipboard`
+- open terminal (`konsole` on Steam Deck)
+- paste the command and hit enter (press `paste` in the top right on Steam Deck)
+- (Steam Deck) open virtual keyboard with `STEAM` + `X` and press `R2` or `Enter` button
+
 ## Compile from source
 
 **Build dependencies:**
