@@ -54,7 +54,7 @@ void ServiceDialog::setupUi() {
 }
 
 void ServiceDialog::copyToClipboard() {
-    auto* clipboard = SingleApplication::clipboard();
+    auto clipboard = SingleApplication::clipboard();
     if (showUninstall->isChecked())
         clipboard->setText(systemdUninstallCommand);
     else
