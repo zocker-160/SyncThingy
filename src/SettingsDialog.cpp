@@ -78,6 +78,6 @@ void SettingsDialog::accept() {
 }
 
 void SettingsDialog::showServiceDialog() {
-    const auto serviceDialog = new ServiceDialog(this);
-    serviceDialog->show();
+    ServiceDialog serviceDialog(this);
+    serviceDialog.exec();
 }
