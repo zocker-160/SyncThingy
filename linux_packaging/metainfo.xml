@@ -27,6 +27,14 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="0.6.1" date="2023-08-08">
+            <description>
+                <ul>
+                    <li>Fix very small memory leak</li>
+                    <li>Improve syncthing health check and add debug messages</li>
+                </ul>
+            </description>
+        </release>
         <release version="0.6" date="2023-03-16">
             <description>
                 <ul>
