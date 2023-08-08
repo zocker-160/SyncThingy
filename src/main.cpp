@@ -125,29 +125,10 @@ private:
         trayIcon->show();
     }
 
-    QNetworkReply* _requestSyncthingHealth() {
-        const auto pingEndpoint = QString(settings.value(C_URL).toString()).append("/rest/noauth/health");
-        QNetworkRequest request(pingEndpoint);
-        request.setRawHeader("Content-Type", "application/json; charset=utf-8");
-        request.setRawHeader("Accept", "application/json");
-
-        return networkManager.get(request);
-    }
-
-    static bool _isSyncthingRunning(QNetworkReply* reply) {
-        auto jsonDoc = QJsonDocument::fromJson(reply->readAll());
-        auto status = jsonDoc.object().value("status");
-
-        if (not status.isUndefined() && status.toString() == "OK")
-            return true;
-        else
-            return false;
-    }
-
     void checkRunning() {
-        auto reply = _requestSyncthingHealth();
-        connect(reply, &QNetworkReply::finished, [=]{
-            if (_isSyncthingRunning(reply)) {
+        auto reply = _requestSyncthingHealth(true);
+        connect(reply, &QNetworkReply::finished, [=] {
+            if (_isSyncthingRunning(reply, true)) {
                 qDebug() << "Syncthing instance seems to be already running, Tray Icon only";
             } else {
                 qDebug() << "Syncthing does not seem to be running, starting own instance";
@@ -156,6 +137,33 @@ private:
             setupTimer();
             reply->deleteLater();
         });
+    }
+
+    QNetworkReply* _requestSyncthingHealth(bool debugPrint) {
+        const auto pingEndpoint = QString(settings.value(C_URL).toString()).append("/rest/noauth/health");
+        if (debugPrint)
+            qDebug() << "Ping endpoint: " << pingEndpoint;
+
+        QNetworkRequest request(pingEndpoint);
+        request.setRawHeader("Content-Type", "application/json; charset=utf-8");
+        request.setRawHeader("Accept", "application/json");
+
+        return networkManager.get(request);
+    }
+
+    static bool _isSyncthingRunning(QNetworkReply* reply, bool debugPrint) {
+        auto jsonDoc = QJsonDocument::fromJson(reply->readAll());
+        auto status = jsonDoc.object().value("status");
+
+        if (debugPrint)
+            qDebug() << "reply: " << jsonDoc;
+
+        if (not status.isUndefined() && status.toString() == "OK") {
+            return true;
+        } else {
+            qDebug() << "syncthing is not running";
+            return false;
+        }
     }
 
     void setupProcess() {
@@ -264,22 +272,22 @@ private:
         }
     }
 
-    bool syncthingProcessRunning() {
-        return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
-    }
-
     void checkSyncthingRunning() {
         //qDebug() << "run check";
 
         if (not syncthingProcessRunning()) {
-            auto reply = _requestSyncthingHealth();
+            auto reply = _requestSyncthingHealth(false);
             connect(reply, &QNetworkReply::finished, [=] {
-                if (not _isSyncthingRunning(reply))
+                if (not _isSyncthingRunning(reply, false))
                     QApplication::quit();
                 else
                     reply->deleteLater();
             });
         }
+    }
+
+    bool syncthingProcessRunning() {
+        return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
     }
 
     static bool checkSyncthingAvailable() {
