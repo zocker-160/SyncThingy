@@ -8,14 +8,17 @@
 #include <QTimer>
 #include <QSettings>
 #include <QSemaphore>
-
-#include <QDebug>
+#include <QFileSystemWatcher>
 
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+
+#include <QDBusConnection>
+#include <QDBusMessage>
+#include <QDBusReply>
 
 #include <cstdlib>
 #include <iostream>
@@ -33,18 +36,20 @@ class SyncThingy : public QDialog {
 public:
     explicit SyncThingy(QSettings& settings) : settings(settings) {
         initSettings();
+        initSettingsWatcher(true);
         workaroundFuckingStupidGTKbug();
         setupUi();
         checkRunning();
         requestBackgroundPermission();
     }
 
+    ~SyncThingy() override {
+        delete semaphore;
+    }
+
 //public slots:
     void stopProcess() {
         qDebug() << "quit triggered \n";
-
-        if (syncthingProcess == nullptr)
-            return;
 
         if (syncthingProcessRunning()) {
             syncthingProcess->terminate();
@@ -72,8 +77,9 @@ public:
 
 private:
     QSettings& settings;
-    QTimer* timer;
-    QProcess* syncthingProcess = nullptr;
+    QFileSystemWatcher* settingsWatcher = new QFileSystemWatcher(this);
+    QTimer* timer = new QTimer(this);
+    QProcess* syncthingProcess = new QProcess(this);
 
     QSemaphore* semaphore = new QSemaphore(1);
     QSystemTrayIcon* trayIcon = new QSystemTrayIcon(this);
@@ -179,7 +185,6 @@ private:
         QStringList arguments;
         arguments << "serve" << "--no-browser" << "--logfile=default";
 
-        syncthingProcess = new QProcess(this);
         syncthingProcess->start("syncthing", arguments);
         syncthingProcess->waitForStarted();
 
@@ -187,7 +192,6 @@ private:
     }
 
     void setupTimer() {
-        timer = new QTimer(this);
         connect(timer, &QTimer::timeout, this, &SyncThingy::checkSyncthingRunning);
         timer->start(5000);
     }
@@ -204,6 +208,21 @@ private:
         }
 
         QString iconType = settings.value(C_ICON).toString();
+        if (iconType == C_ICON_SYSTEM) {
+            auto preferredTheme = requestSystemTheme();
+            switch (preferredTheme) {
+                case 1:
+                    iconType = C_ICON_BLACK;
+                    break;
+                case 2:
+                    iconType = C_ICON_WHITE;
+                    break;
+                default:
+                    iconType = C_ICON_COLOR;
+                    break;
+            }
+        }
+
         if (iconType == C_ICON_WHITE or iconType == C_ICON_BLACK)
             iconType = prefix + "." + iconType;
         else
@@ -214,20 +233,74 @@ private:
     }
 
     void initSettings() {
+        if (not settings.contains(C_ICON)) {
+            settings.setValue(C_ICON, C_ICON_COLOR);
+        }
+
         if (not settings.contains(C_URL)) {
             settings.setValue(C_URL, "http://127.0.0.1:8384");
-            settings.setValue(C_ICON, "default");
-            settings.sync();
         }
         // new setting in 0.4 which needs to be true by default
         if (not settings.contains(C_AUTOSTART)) {
             settings.setValue(C_AUTOSTART, true);
-            settings.sync();
         }
         // new setting in 0.5 which needs to be true by default
         if (not settings.contains(C_NOTIFICATION)) {
             settings.setValue(C_NOTIFICATION, true);
-            settings.sync();
+        }
+
+        settings.sync();
+    }
+
+    void initSettingsWatcher(bool init) {
+        // we need to do this, because QT does recreate the config file when saving
+        settingsWatcher->removePath(settings.fileName());
+
+        if (not settingsWatcher->addPath(settings.fileName())) {
+            qDebug() << "failed to add" << settings.fileName() << "to watchlist!";
+            return;
+        }
+
+        if (init) {
+            connect(settingsWatcher, &QFileSystemWatcher::fileChanged, [=] {
+                qDebug() << "settings changed";
+                settings.sync();
+                updateIcon();
+            });
+
+            qDebug() << "watcher running on" << settings.fileName();
+        }
+    }
+
+    static unsigned int requestSystemTheme() {
+        qDebug() << "requesting system theme";
+        auto connection = QDBusConnection::sessionBus();
+
+        // DBus is such fucking garbage!
+        auto message = QDBusMessage::createMethodCall(
+                "org.freedesktop.portal.Desktop", // Service name
+                "/org/freedesktop/portal/desktop", // Object path
+                "org.freedesktop.portal.Settings", // Interface
+                "Read" // Method name
+        );
+        message << "org.freedesktop.appearance" << "color-scheme";
+
+        QDBusReply<QDBusVariant> reply = connection.call(message);
+        if (reply.isValid()) {
+            auto response = reply.value();
+            auto variantValue = response.variant().value<QDBusVariant>().variant(); // Linux desktop portals just fucking suck balls!!
+
+            /*
+             * 0: No preference
+             * 1: Prefer dark appearance
+             * 2: Prefer light appearance
+             */
+            auto actualValue = variantValue.toUInt();
+            qDebug() << "got answer:" << actualValue;
+            return actualValue;
+        } else {
+            qDebug() << "DBus call failed: " << reply.error().message();
+            return 0;
         }
     }
 
@@ -287,7 +360,7 @@ private:
     }
 
     bool syncthingProcessRunning() {
-        return syncthingProcess != nullptr && syncthingProcess->state() == QProcess::Running;
+        return syncthingProcess->state() == QProcess::Running;
     }
 
     static bool checkSyncthingAvailable() {
@@ -312,9 +385,8 @@ private:
     }
 
     void handleActivation(QSystemTrayIcon::ActivationReason reason) {
-        switch (reason) {
-            case QSystemTrayIcon::Trigger:
-                showBrowser();
+        if (reason == QSystemTrayIcon::Trigger) {
+            showBrowser();
         }
     }
 
@@ -328,6 +400,9 @@ private:
             if (options.exec() == QDialog::Accepted) {
                 updateIcon();
                 requestBackgroundPermission();
+
+                // reset QFileSystemWatcher because QT does actually delete the file and create a new one
+                initSettingsWatcher(false);
             }
 
             hide(); // see workaroundFuckingStupidGTKbug()

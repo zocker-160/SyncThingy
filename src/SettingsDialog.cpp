@@ -31,6 +31,7 @@ void SettingsDialog::setupUi(const QIcon& icon) {
     iconBox->addItem(C_ICON_COLOR);
     iconBox->addItem(C_ICON_WHITE);
     iconBox->addItem(C_ICON_BLACK);
+    iconBox->addItem(C_ICON_SYSTEM);
     iconLayout->addWidget(iconLabel);
     iconLayout->addWidget(iconBox);
 
