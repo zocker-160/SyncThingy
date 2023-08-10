@@ -212,10 +212,10 @@ private:
             auto preferredTheme = requestSystemTheme();
             switch (preferredTheme) {
                 case 1:
-                    iconType = C_ICON_BLACK;
+                    iconType = C_ICON_WHITE;
                     break;
                 case 2:
-                    iconType = C_ICON_WHITE;
+                    iconType = C_ICON_BLACK;
                     break;
                 default:
                     iconType = C_ICON_COLOR;
