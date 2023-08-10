@@ -268,7 +268,7 @@ private:
                 updateIcon();
             });
 
-            qDebug() << "watcher running on" << settings.fileName();
+            qDebug() << "config watcher running";
         }
     }
 
