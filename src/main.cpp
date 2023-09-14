@@ -143,6 +143,14 @@ private:
             setupTimer();
             reply->deleteLater();
         });
+        connect(reply, &QNetworkReply::errorOccurred, [=](QNetworkReply::NetworkError error) {
+            qDebug() << "ERROR: " << error;
+
+            if (error == QNetworkReply::SslHandshakeFailedError) {
+                trayIcon->showMessage("ERROR", "SSL Handshake failed", QSystemTrayIcon::Critical, 0);
+                QApplication::quit();
+            }
+        });
     }
 
     QNetworkReply* _requestSyncthingHealth(bool debugPrint) {
@@ -151,6 +159,9 @@ private:
             qDebug() << "Ping endpoint: " << pingEndpoint;
 
         QNetworkRequest request(pingEndpoint);
+        QSslConfiguration sslConf = request.sslConfiguration();
+        sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
+        request.setSslConfiguration(sslConf);
         request.setRawHeader("Content-Type", "application/json; charset=utf-8");
         request.setRawHeader("Accept", "application/json");
 
