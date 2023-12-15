@@ -24,16 +24,20 @@
 
     <url type="homepage">https://github.com/zocker-160/SyncThingy</url>
     <url type="bugtracker">https://github.com/zocker-160/SyncThingy/issues</url>
+    <url type="donation">https://ko-fi.com/zocker_160</url>
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
-        <release version="0.7.2" date="2023-09-14">
+        <release version="0.7.3" date="2023-12-15">
             <description>
                 <ul>
                     <li>Fix health check not working when HTTPS is enabled</li>
                     <li>Add failed network requests to log</li>
+                    <li>Update app metadata</li>
                 </ul>
             </description>
+        </release>
+        <release version="0.7.2" date="2023-09-14">
         </release>
         <release version="0.7.1" date="2023-08-10">
             <description>
