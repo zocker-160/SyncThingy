@@ -2,7 +2,7 @@
 Name=SyncThingy
 Exec=SyncThingy
 GenericName=File synchronization
-Comment=SyncThingy = Synthing + simple tray indicator
+Comment=SyncThingy = Syncthing + simple tray indicator
 Icon=syncthing
 StartupNotify=false
 Terminal=false
