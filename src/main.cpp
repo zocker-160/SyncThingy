@@ -28,7 +28,7 @@
 #include <SingleApplication>
 #include "SettingsDialog.h"
 
-#define VERSION "v0.7.3"
+#define VERSION "v0.7.4"
 #define APP_NAME "SyncThingy"
 
 class SyncThingy : public QDialog {
