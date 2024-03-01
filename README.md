@@ -13,12 +13,18 @@ The answer is simple: there is currently no application available as Flatpak and
 
 ## Configuration
 
-Configuration file can be found under `~/.var/app/com.github.zocker_160.SyncThingy/config/SyncThingy`
+SyncThingy config file can be found under `~/.var/app/com.github.zocker_160.SyncThingy/config/SyncThingy`:
 
 - `autostart` can be `true` or `false`
 - `icon` can be set to `default`, `white` or `black`
 - `url` defines the link opened when selecting `Open WebUI`
 - `notifications` can be `true` or `false`
+
+#### Note
+
+Syncthing config can be found under `~/.var/app/com.github.zocker_160.SyncThingy/config/syncthing`.
+
+You can reuse your already existing syncthing config file, by moving / copying it there.
 
 ## Install background service
 
