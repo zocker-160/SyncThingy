@@ -13,7 +13,7 @@ The answer is simple: there is currently no application available as Flatpak and
 
 ## Configuration
 
-SyncThingy config file can be found under `~/.var/app/com.github.zocker_160.SyncThingy/config/SyncThingy`:
+SyncThingy config is located at `~/.var/app/com.github.zocker_160.SyncThingy/config/SyncThingy`:
 
 - `autostart` can be `true` or `false`
 - `icon` can be set to `default`, `white` or `black`
@@ -22,7 +22,7 @@ SyncThingy config file can be found under `~/.var/app/com.github.zocker_160.Sync
 
 #### Note
 
-Syncthing config can be found under `~/.var/app/com.github.zocker_160.SyncThingy/config/syncthing`.
+Syncthing config is located at `~/.var/app/com.github.zocker_160.SyncThingy/config/syncthing`.
 
 You can reuse your already existing syncthing config file, by moving / copying it there.
 
