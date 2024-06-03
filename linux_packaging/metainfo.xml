@@ -28,6 +28,13 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="0.7.5" date="2024-06-03">
+            <description>
+                <ul>
+                    <li>Change some wordings in the UI and error messages</li>
+                </ul>
+            </description>
+        </release>
         <release version="0.7.4" date="2024-02-07">
             <description>
                 <ul>
