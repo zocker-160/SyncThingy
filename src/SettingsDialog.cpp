@@ -36,7 +36,8 @@ void SettingsDialog::setupUi(const QIcon& icon) {
     iconLayout->addWidget(iconBox);
 
     autostartBox = new QCheckBox("autostart on login", this);
-    notificationBox = new QCheckBox("disable notifications", this);
+    notificationBox = new QCheckBox("disable start/stop notifications", this);
+    notificationBox->setToolTip("affects start and stop service notifications only - errors will still be shown");
 
     createBGService = new QPushButton("install as system service", this);
 
