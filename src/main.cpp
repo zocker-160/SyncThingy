@@ -348,8 +348,8 @@ private:
         else {
             qDebug() << "Background / Autostart permission revoked";
             tray->trayIcon->showMessage(
-                "Background permission revoked",
-                "SyncThingy might not work as expected!",
+                "Background permission request failed",
+                "SyncThingy might not work as expected",
                 tray->trayIcon->icon(),
                 0
             );
