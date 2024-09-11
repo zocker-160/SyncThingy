@@ -22,9 +22,12 @@ SyncThingy config is located at `~/.var/app/com.github.zocker_160.SyncThingy/con
 
 #### Note
 
-Syncthing config is located at `~/.var/app/com.github.zocker_160.SyncThingy/.local/state/syncthing`.
+Syncthing config is located at `~/.var/app/com.github.zocker_160.SyncThingy/config/syncthing`.
 
-You can reuse your already existing syncthing config.xml file, by moving / copying it there.
+NOTE: this location seems to differ on some installations, so if the folder above does not work for you,
+try `~/.var/app/com.github.zocker_160.SyncThingy/.local/state/syncthing` instead.
+
+You can reuse your already existing syncthing `config.xml` file, by moving / copying it there.
 
 ## Install background service
 
