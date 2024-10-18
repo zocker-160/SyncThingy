@@ -53,7 +53,7 @@ It does not really make much sense to use this on a normal Linux Desktop.
 - `libportal-qt5-dev`
 
 ```bash
-git clone https://github.com/zocker-160/SyncThingy.git
+git clone --recurse-submodules https://github.com/zocker-160/SyncThingy.git
 cd SyncThingy
 cmake -S . -B out
 cd out
