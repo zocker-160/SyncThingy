@@ -9,7 +9,7 @@ SyncThingy = Syncthing + simple tray indicator
 
 Why yet another Syncthing tray / statusbar / wrapper / ui ... application?
 
-The answer is simple: there is currently no application available as Flatpak and on Flathub, which offers just the bare minimum: Syncthing and a tray icon.
+The answer is simple: I just wanted a Flatpak on Flathub which offers just the bare minimum: Syncthing and a tray icon.
 
 ## Configuration
 
