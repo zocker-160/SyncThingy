@@ -420,7 +420,7 @@ private:
 //private slots:
     void showBrowser() {
         qDebug() << "opening Syncthing webui using xdg-open";
-        system(QString("xdg-open ").append(getUrl(false)).toStdString().c_str());
+        system(QString("xdg-open ").append(getUrl(useHttpsForEndpoint)).toStdString().c_str());
     };
 
     void openConfig() {
