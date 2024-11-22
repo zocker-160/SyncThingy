@@ -28,6 +28,14 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="0.8" date="2024-11-22">
+            <description>
+                <ul>
+                    <li>Fix crash when HTTPS is enabled for Syncthing WebUI</li>
+                    <li>Small rework of settings dialog</li>
+                </ul>
+            </description>
+        </release>
         <release version="0.7.5" date="2024-06-03">
             <description>
                 <ul>
