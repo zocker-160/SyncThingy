@@ -10,10 +10,7 @@ void SettingsDialog::setupUi(const QIcon& icon) {
     setWindowIcon(icon);
     setMinimumWidth(300);
 
-    auto mainLayout = new QVBoxLayout(this);
-    auto urlLayout = new QHBoxLayout();
-    auto iconLayout = new QHBoxLayout();
-
+    // Title
     auto title = new QLabel("Settings", this);
     title->setMaximumHeight(30);
     title->setAlignment(Qt::AlignCenter);
@@ -21,33 +18,57 @@ void SettingsDialog::setupUi(const QIcon& icon) {
     font.setBold(true);
     title->setFont(font);
 
-    auto urlLabel = new QLabel("URL:", this);
-    urlText = new QLineEdit(this);
-    urlLayout->addWidget(urlLabel);
-    urlLayout->addWidget(urlText);
+    // IP - Port
+    auto ipBox = new QGroupBox("IP", this);
+    auto ipBoxLayout = new QHBoxLayout(ipBox);
 
-    auto iconLabel = new QLabel("Icon:", this);
-    iconBox = new QComboBox(this);
-    iconBox->addItem(C_ICON_COLOR);
-    iconBox->addItem(C_ICON_WHITE);
-    iconBox->addItem(C_ICON_BLACK);
-    iconBox->addItem(C_ICON_SYSTEM);
-    iconLayout->addWidget(iconLabel);
-    iconLayout->addWidget(iconBox);
+    ipText = new QLineEdit(this);
+    ipText->setPlaceholderText("127.0.0.1");
+    ipBoxLayout->addWidget(ipText);
+    //
+    auto portBox = new QGroupBox("Port", this);
+    auto portBoxLayout = new QHBoxLayout(portBox);
+
+    portInput = new QSpinBox(this);
+    portInput->setMinimum(1024);
+    portInput->setMaximum(65535);
+    portBoxLayout->addWidget(portInput);
+    //
+    auto urlBoxLayout = new QHBoxLayout();
+    urlBoxLayout->addWidget(ipBox);
+    urlBoxLayout->addWidget(portBox);
+
+    // Icon selector
+    auto iconBox = new QGroupBox("Icon", this);
+    auto iconBoxLayout = new QHBoxLayout(iconBox);
+
+    iconSelector = new QComboBox(this);
+    iconSelector->addItem(C_ICON_COLOR);
+    iconSelector->addItem(C_ICON_WHITE);
+    iconSelector->addItem(C_ICON_BLACK);
+    iconSelector->addItem(C_ICON_SYSTEM);
+    iconBoxLayout->addWidget(iconSelector);
+
+    // Misc
+    auto miscBox = new QGroupBox("Misc", this);
+    auto miscBoxLayout = new QVBoxLayout(miscBox);
 
     autostartBox = new QCheckBox("autostart on login", this);
     notificationBox = new QCheckBox("disable start/stop notifications", this);
     notificationBox->setToolTip("affects start and stop service notifications only - errors will still be shown");
+    miscBoxLayout->addWidget(autostartBox);
+    miscBoxLayout->addWidget(notificationBox);
 
+    // Buttons
     createBGService = new QPushButton("install as system service", this);
-
     auto confirmButtons = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel);
 
+    // Main layout
+    auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(title);
-    mainLayout->addLayout(urlLayout);
-    mainLayout->addLayout(iconLayout);
-    mainLayout->addWidget(autostartBox);
-    mainLayout->addWidget(notificationBox);
+    mainLayout->addLayout(urlBoxLayout);
+    mainLayout->addWidget(iconBox);
+    mainLayout->addWidget(miscBox);
     mainLayout->addWidget(createBGService);
     mainLayout->addWidget(confirmButtons);
 
@@ -57,20 +78,27 @@ void SettingsDialog::setupUi(const QIcon& icon) {
 }
 
 void SettingsDialog::loadSettings() {
+    qDebug() << "loading settings";
+
     settings.sync();
-    urlText->setText(settings.value(C_URL).toString());
-    iconBox->setCurrentText(settings.value(C_ICON).toString());
+
+    ipText->setText(settings.value(C_IP).toString());
+    portInput->setValue(settings.value(C_PORT).toInt());
+    iconSelector->setCurrentText(settings.value(C_ICON).toString());
+
     autostartBox->setChecked(settings.value(C_AUTOSTART).toBool());
-    notificationBox->setChecked(not settings.value(C_NOTIFICATION).toBool());
+    notificationBox->setChecked(settings.value(C_NOTIFICATION).toBool());
 }
 
 void SettingsDialog::saveSettings() {
     qDebug() << "saving settings";
 
-    settings.setValue(C_URL, urlText->text());
-    settings.setValue(C_ICON, iconBox->currentText());
+    settings.setValue(C_IP, ipText->text());
+    settings.setValue(C_PORT, portInput->value());
+    settings.setValue(C_ICON, iconSelector->currentText());
     settings.setValue(C_AUTOSTART, autostartBox->isChecked());
-    settings.setValue(C_NOTIFICATION, not notificationBox->isChecked());
+    settings.setValue(C_NOTIFICATION, notificationBox->isChecked());
+
     settings.sync();
 }
 

@@ -15,6 +15,8 @@
 #include <QLineEdit>
 #include <QIcon>
 #include <QPushButton>
+#include <QGroupBox>
+#include <QSpinBox>
 
 #include <QDialogButtonBox>
 
@@ -30,8 +32,10 @@ public:
 
 private:
     QSettings& settings;
-    QLineEdit* urlText;
-    QComboBox* iconBox;
+
+    QLineEdit* ipText;
+    QSpinBox* portInput;
+    QComboBox* iconSelector;
     QCheckBox* autostartBox;
     QCheckBox* notificationBox;
     QPushButton* createBGService;
