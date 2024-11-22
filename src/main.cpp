@@ -28,8 +28,6 @@
 #include <SingleApplication>
 #include "SettingsDialog.h"
 
-#define VERSION "v0.7.5"
-#define APP_NAME "SyncThingy"
 
 class SyncThingy : public QDialog {
 
@@ -85,6 +83,7 @@ private:
     QSystemTrayIcon* trayIcon = new QSystemTrayIcon(this);
 
     QNetworkAccessManager networkManager;
+    bool useHttpsForEndpoint = false;
 
     void workaroundFuckingStupidGTKbug() {
         // Yes I know this ridiculously stupid, but I have to work around a stupid GTK / GNOME bug
@@ -129,18 +128,34 @@ private:
 
         trayIcon->setContextMenu(menu);
         trayIcon->show();
+
+#ifdef QT_DEBUG
+        showSettingsDialog();
+#endif
     }
 
     void checkRunning() {
-        auto reply = _requestSyncthingHealth(true);
+        QNetworkReply* reply = isSyncthingStatusOk(true, false);
         connect(reply, &QNetworkReply::finished, [=] {
-            if (_isSyncthingRunning(reply, true)) {
+            if (isOkReply(reply, true)) {
                 qDebug() << "Syncthing instance seems to be already running, Tray Icon only";
+                setupTimer();
             } else {
-                qDebug() << "Syncthing does not seem to be running, starting own instance";
-                setupProcess();
+                qDebug() << "HTTP check failed, retry with HTTPS";
+                QNetworkReply* reply2 = isSyncthingStatusOk(true, true);
+                connect(reply2, &QNetworkReply::finished, [=] {
+                    if (isOkReply(reply2, true)) {
+                        qDebug() << "Syncthing instance seems to be already running, Tray Icon only";
+                        useHttpsForEndpoint = true;
+                        setupTimer();
+                    } else {
+                        qDebug() << "Syncthing does not seem to be running, starting own instance";
+                        setupProcess();
+                        setupTimer();
+                    }
+                    reply2->deleteLater();
+                });
             }
-            setupTimer();
             reply->deleteLater();
         });
         connect(reply, &QNetworkReply::errorOccurred, [=](QNetworkReply::NetworkError error) {
@@ -153,14 +168,15 @@ private:
         });
     }
 
-    QNetworkReply* _requestSyncthingHealth(bool debugPrint) {
-        const auto pingEndpoint = QString(settings.value(C_URL).toString()).append("/rest/noauth/health");
+    QNetworkReply* isSyncthingStatusOk(bool debugPrint, bool useHttps) {
+        auto endpoint = getUrl(useHttps).append("/rest/noauth/health");
         if (debugPrint)
-            qDebug() << "Ping endpoint: " << pingEndpoint;
+            qDebug() << "Ping endpoint: " << endpoint;
 
-        QNetworkRequest request(pingEndpoint);
+        QNetworkRequest request(endpoint);
         QSslConfiguration sslConf = request.sslConfiguration();
         sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
+
         request.setSslConfiguration(sslConf);
         request.setRawHeader("Content-Type", "application/json; charset=utf-8");
         request.setRawHeader("Accept", "application/json");
@@ -168,9 +184,9 @@ private:
         return networkManager.get(request);
     }
 
-    static bool _isSyncthingRunning(QNetworkReply* reply, bool debugPrint) {
-        auto jsonDoc = QJsonDocument::fromJson(reply->readAll());
-        auto status = jsonDoc.object().value("status");
+    static bool isOkReply(QNetworkReply* reply, bool debugPrint) {
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(reply->readAll());
+        QJsonValue status = jsonDoc.object().value("status");
 
         if (debugPrint)
             qDebug() << "reply: " << jsonDoc;
@@ -178,7 +194,6 @@ private:
         if (not status.isUndefined() && status.toString() == "OK") {
             return true;
         } else {
-            qDebug() << "syncthing is not running";
             return false;
         }
     }
@@ -244,18 +259,22 @@ private:
     }
 
     void initSettings() {
+        if (not settings.contains(C_IP)) {
+            settings.setValue(C_IP, DEFAULT_IP);
+        }
+
+        if (not settings.contains(C_PORT)) {
+            settings.setValue(C_PORT, DEFAULT_PORT);
+        }
+
         if (not settings.contains(C_ICON)) {
             settings.setValue(C_ICON, C_ICON_COLOR);
         }
 
-        if (not settings.contains(C_URL)) {
-            settings.setValue(C_URL, "http://127.0.0.1:8384");
-        }
-        // new setting in 0.4 which needs to be true by default
         if (not settings.contains(C_AUTOSTART)) {
             settings.setValue(C_AUTOSTART, true);
         }
-        // new setting in 0.5 which needs to be true by default
+
         if (not settings.contains(C_NOTIFICATION)) {
             settings.setValue(C_NOTIFICATION, true);
         }
@@ -357,15 +376,18 @@ private:
     }
 
     void checkSyncthingRunning() {
-        //qDebug() << "run check";
-
         if (not syncthingProcessRunning()) {
-            auto reply = _requestSyncthingHealth(false);
+#ifdef QT_DEBUG
+            bool debug = true;
+#else
+            bool debug = false;
+#endif
+            QNetworkReply* reply = isSyncthingStatusOk(debug, useHttpsForEndpoint);
             connect(reply, &QNetworkReply::finished, [=] {
-                if (not _isSyncthingRunning(reply, false))
+                if (not isOkReply(reply, debug)) {
                     QApplication::quit();
-                else
-                    reply->deleteLater();
+                }
+                reply->deleteLater();
             });
         }
     }
@@ -379,10 +401,26 @@ private:
         return ret == 0;
     }
 
+    QString getUrl(bool useHttps) {
+        QString url;
+
+        if (useHttps)
+            url.append("https");
+        else
+            url.append("http");
+
+        url.append("://")
+            .append(settings.value(C_IP).toString())
+            .append(":")
+            .append(settings.value(C_PORT).toString());
+
+        return url;
+    }
+
 //private slots:
     void showBrowser() {
         qDebug() << "opening Syncthing webui using xdg-open";
-        system(QString("xdg-open ").append(settings.value(C_URL).toString()).toStdString().c_str());
+        system(QString("xdg-open ").append(getUrl(false)).toStdString().c_str());
     };
 
     void openConfig() {
@@ -427,6 +465,8 @@ private:
         if (settings.value(C_NOTIFICATION).toBool())
             trayIcon->showMessage(title, msg, icon, msecs);
     }
+
+
 };
 
 int main(int argc, char *argv[]) {
