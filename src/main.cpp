@@ -25,7 +25,7 @@
 
 #include <libportal-qt5/portal-qt5.h>
 
-#include <SingleApplication>
+#include "SingleApplication"
 #include "SettingsDialog.h"
 
 
