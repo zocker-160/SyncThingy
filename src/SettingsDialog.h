@@ -37,7 +37,7 @@ private:
     QSpinBox* portInput;
     QComboBox* iconSelector;
     QCheckBox* autostartBox;
-    QCheckBox* notificationBox;
+    QCheckBox* noNotificationBox;
     QPushButton* createBGService;
 
     void setupUi(const QIcon& icon);
