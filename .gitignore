@@ -19,3 +19,5 @@ cmake-*
 build*
 
 linux_packaging/com.github*
+
+*.code-workspace
