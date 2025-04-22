@@ -58,7 +58,11 @@ cd SyncThingy
 mkdir build && cd build
 cmake ..
 cmake --build .
-sudo make install (optional)
+
+# installation (optional)
+sudo cmake --install .
+# or
+sudo cmake --install . --prefix "your/custom/prefix/path
 ```
 
 ### Note for non-Flatpak users
