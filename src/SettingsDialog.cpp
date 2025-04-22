@@ -54,10 +54,10 @@ void SettingsDialog::setupUi(const QIcon& icon) {
     auto miscBoxLayout = new QVBoxLayout(miscBox);
 
     autostartBox = new QCheckBox("autostart on login", this);
-    notificationBox = new QCheckBox("disable start/stop notifications", this);
-    notificationBox->setToolTip("affects start and stop service notifications only - errors will still be shown");
+    noNotificationBox = new QCheckBox("disable start/stop notifications", this);
+    noNotificationBox->setToolTip("affects start and stop service notifications only - errors will still be shown");
     miscBoxLayout->addWidget(autostartBox);
-    miscBoxLayout->addWidget(notificationBox);
+    miscBoxLayout->addWidget(noNotificationBox);
 
     // Buttons
     createBGService = new QPushButton("install as system service", this);
@@ -87,7 +87,7 @@ void SettingsDialog::loadSettings() {
     iconSelector->setCurrentText(settings.value(C_ICON).toString());
 
     autostartBox->setChecked(settings.value(C_AUTOSTART).toBool());
-    notificationBox->setChecked(settings.value(C_NOTIFICATION).toBool());
+    noNotificationBox->setChecked(not settings.value(C_NOTIFICATION).toBool());
 }
 
 void SettingsDialog::saveSettings() {
@@ -97,7 +97,7 @@ void SettingsDialog::saveSettings() {
     settings.setValue(C_PORT, portInput->value());
     settings.setValue(C_ICON, iconSelector->currentText());
     settings.setValue(C_AUTOSTART, autostartBox->isChecked());
-    settings.setValue(C_NOTIFICATION, notificationBox->isChecked());
+    settings.setValue(C_NOTIFICATION, not noNotificationBox->isChecked());
 
     settings.sync();
 }
