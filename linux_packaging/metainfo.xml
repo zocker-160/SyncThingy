@@ -28,6 +28,13 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="0.8.1" date="2025-04-22">
+            <description>
+                <ul>
+                    <li>Fix inverted notification checkbox description in settings dialog</li>
+                </ul>
+            </description>
+        </release>
         <release version="0.8" date="2024-11-22">
             <description>
                 <ul>
