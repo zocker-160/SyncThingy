@@ -55,9 +55,9 @@ It does not really make much sense to use this on a normal Linux Desktop.
 ```bash
 git clone --recurse-submodules https://github.com/zocker-160/SyncThingy.git
 cd SyncThingy
-cmake -S . -B out
-cd out
-make
+mkdir build && cd build
+cmake ..
+cmake --build .
 sudo make install (optional)
 ```
 
