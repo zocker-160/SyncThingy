@@ -31,6 +31,8 @@ add_executable(${PROJECT_NAME}
         src/ServiceDialog.cpp
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE src)
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
         Qt5::Core
         Qt5::Gui
@@ -39,8 +41,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
         PkgConfig::PORTAL-QT
         SingleApplication
 )
-
-target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 
 include(GNUInstallDirs)
