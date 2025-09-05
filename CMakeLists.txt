@@ -13,9 +13,9 @@ set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleAp
 add_definitions(-DQT_NO_KEYWORDS)
 
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(PORTAL-QT REQUIRED IMPORTED_TARGET libportal-qt5)
+pkg_check_modules(PORTAL-QT REQUIRED IMPORTED_TARGET libportal-qt6)
 
-find_package(Qt5 COMPONENTS
+find_package(Qt6 COMPONENTS
         Core
         Gui
         Widgets
@@ -34,10 +34,10 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PRIVATE src)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::DBus
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::DBus
         PkgConfig::PORTAL-QT
         SingleApplication
 )

@@ -47,6 +47,11 @@ void ServiceDialog::setupUi() {
     mainLayout->addLayout(lowerRow);
 
     connect(copyToClipboardBtn, &QPushButton::clicked, this, &ServiceDialog::copyToClipboard);
+    /*
+     * QCheckBox::StateChanged emits a deprecation warning on Qt 6.7+.
+     * Don't fix it for now, as the new method was introduced in 6.7,
+     * and e.g. Debian Bookworm ship versions older than that.
+     */
     connect(showUninstall, &QCheckBox::stateChanged, this, &ServiceDialog::toggleCommandContent);
     connect(helpINeedMommy, &QPushButton::clicked, this, &ServiceDialog::openHelpPage);
     connect(confirmButtons, &QDialogButtonBox::helpRequested, this, &ServiceDialog::openHelpPage);
