@@ -3,7 +3,7 @@ Name=SyncThingy
 Exec=SyncThingy
 GenericName=File synchronization
 Comment=SyncThingy = Syncthing + simple tray indicator
-Icon=syncthing
+Icon=com.github.zocker_160.SyncThingy
 StartupNotify=false
 Terminal=false
 Type=Application
