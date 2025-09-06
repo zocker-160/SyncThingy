@@ -46,9 +46,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 include(GNUInstallDirs)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_BINDIR})
-install(FILES linux_packaging/SyncThingy.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES linux_packaging/SyncThingy.desktop
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+        RENAME ${FLATPAK_APPID}.desktop
+)
 install(FILES icons/color.png
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/512x512/apps
+        RENAME ${FLATPAK_APPID}.png
 )
 install(FILES icons/white.png
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/512x512/apps
@@ -60,5 +64,5 @@ install(FILES icons/black.png
 )
 install(FILES linux_packaging/metainfo.xml
         DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo
-        RENAME ${PROJECT_NAME}.xml
+        RENAME ${FLATPAK_APPID}.xml
 )
