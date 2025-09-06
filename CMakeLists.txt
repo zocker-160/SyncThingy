@@ -64,5 +64,5 @@ install(FILES icons/black.png
 )
 install(FILES linux_packaging/metainfo.xml
         DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo
-        RENAME ${FLATPAK_APPID}.xml
+        RENAME ${FLATPAK_APPID}.metainfo.xml
 )
