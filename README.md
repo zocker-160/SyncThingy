@@ -3,7 +3,9 @@ SyncThingy = Syncthing + simple tray indicator
 
 ![Screenshot1](screenshots/Screenshot_v3.png)
 
-[<img width="240px" src="https://flathub.org/assets/badges/flathub-badge-en.png" />](https://flathub.org/apps/details/com.github.zocker_160.SyncThingy)
+<a href='https://flathub.org/apps/com.github.zocker_160.SyncThingy'>
+    <img width='240' alt='Get it on Flathub' src='https://flathub.org/api/badge?locale=en'/>
+</a>
 
 ## Motivation
 
