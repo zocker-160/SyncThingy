@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2022 - 2024 zocker_160 -->
+<!-- Copyright 2022 - 2026 zocker_160 -->
 <component type="desktop">
     <id>com.github.zocker_160.SyncThingy</id>
     <metadata_license>CC0-1.0</metadata_license>
@@ -10,7 +10,9 @@
     <developer_name>zocker_160</developer_name>
     <summary>SyncThingy = Syncthing + simple tray indicator</summary>
     <description>
-        <p>SyncThingy is a simple tray indicator for Syncthing written in C++.</p>
+        <p>
+        SyncThingy is a simple tray indicator for Syncthing written in C++.
+        </p>
         <p>
         Following the KISS principle, it allows you to see if Syncthing is running, stop it and manage it using the default webui.
         </p>
@@ -18,16 +20,28 @@
 
     <screenshots>
         <screenshot type="default">
-            <image>https://raw.githubusercontent.com/zocker-160/SyncThingy/3d016cc6588137085a208247a4f6743e67bba734/screenshots/Screenshot_v3_flhub.png</image>
+            <caption>Tray icon menu</caption>
+            <image>
+            https://raw.githubusercontent.com/zocker-160/SyncThingy/3d016cc6588137085a208247a4f6743e67bba734/screenshots/Screenshot_v3_flhub.png
+            </image>
         </screenshot>
     </screenshots>
 
     <url type="homepage">https://github.com/zocker-160/SyncThingy</url>
+    <url type="vcs-browser">https://github.com/zocker-160/SyncThingy</url>
     <url type="bugtracker">https://github.com/zocker-160/SyncThingy/issues</url>
     <url type="donation">https://ko-fi.com/zocker_160</url>
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="0.8.2" date="2026-03-03">
+            <description>
+                <ul>
+                    <li>Fix linter warnings in metainfo</li>
+                    <li>Upgrade to golang 1.25</li>
+                </ul>
+            </description>
+        </release>
         <release version="0.8.1" date="2025-04-22">
             <description>
                 <ul>
