@@ -34,9 +34,10 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
-        <release version="0.8.2" date="2026-03-03">
+        <release version="0.8.3" date="2026-03-04">
             <description>
                 <ul>
+                    <li>Implement OpenURI xdg desktop portal </li>
                     <li>Fix linter warnings in metainfo</li>
                     <li>Upgrade to golang 1.25</li>
                 </ul>
