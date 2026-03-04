@@ -418,19 +418,31 @@ private:
     }
 
 //private slots:
+    static void openURI(const QString& url) {
+        xdp_portal_open_uri(
+            XdpQt::globalPortalObject(),
+            nullptr,
+            url.toStdString().c_str(),
+            XdpOpenUriFlags::XDP_OPEN_URI_FLAG_NONE,
+            nullptr,
+            nullptr,
+            nullptr
+        );
+    }
+
     void showBrowser() {
-        qDebug() << "opening Syncthing webui using xdg-open";
-        system(QString("xdg-open ").append(getUrl(useHttpsForEndpoint)).toStdString().c_str());
-    };
+        qDebug() << "opening Syncthing webui (XDG Portal)";
+        openURI(getUrl(useHttpsForEndpoint));
+    }
 
     void openConfig() {
-        qDebug() << "opening config file using xdg-open";
-        system(QString("xdg-open ").append(settings.fileName()).toStdString().c_str());
+        qDebug() << "opening config file (XDG Portal)";
+        openURI(QString("file://").append(settings.fileName()));
     }
 
     static void showGitHub() {
-        qDebug() << "opening GitHub page using xdg-open";
-        system(QString("xdg-open ").append(C_GITHUB).toStdString().c_str());
+        qDebug() << "opening GitHub page (XDG Portal)";
+        openURI(QString(C_GITHUB));
     }
 
     void handleActivation(QSystemTrayIcon::ActivationReason reason) {
