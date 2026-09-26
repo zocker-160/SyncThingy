@@ -6,6 +6,13 @@
 #define C_ICON "icon"
 #define C_AUTOSTART "autostart"
 #define C_NOTIFICATION "notifications"
+#define C_OPEN_WEBUI_ON_LAUNCH "open-webui-on-launch"
+
+#define C_ARG_SETTINGS "--settings"
+#define C_ARG_NO_BROWSER "--no-browser"
+
+#define C_MSG_SETTINGS "settings"
+#define C_MSG_BROWSER "browser"
 
 #define C_ICON_COLOR "color"
 #define C_ICON_WHITE "white"

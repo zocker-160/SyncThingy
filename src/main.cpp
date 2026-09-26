@@ -32,13 +32,21 @@
 class SyncThingy : public QDialog {
 
 public:
-    explicit SyncThingy(QSettings& settings) : settings(settings) {
+    explicit SyncThingy(QSettings& settings, const bool openSettings, const bool noBrowser) : settings(settings)
+    {
         initSettings();
         initSettingsWatcher(true);
         workaroundFuckingStupidGTKbug();
         setupUi();
         checkRunning();
         requestBackgroundPermission();
+
+        if (openSettings) {
+            showSettingsDialog();
+        }
+        else if (settings.value(C_OPEN_WEBUI_ON_LAUNCH).toBool() && noBrowser == false) {
+            showBrowser();
+        }
     }
 
     ~SyncThingy() override {
@@ -46,6 +54,20 @@ public:
     }
 
 //public slots:
+    void handleReceivedMessage(const QByteArray message) {
+        if (message == C_MSG_SETTINGS) {
+            qDebug() << "received message: open settings";
+            showSettingsDialog();
+        }
+        else if (message == C_MSG_BROWSER) {
+            qDebug() << "received message: open browser";
+            showBrowser();
+        }
+        else {
+            qDebug() << "received unknown message:" << message;
+        }
+    }
+
     void stopProcess() {
         qDebug() << "quit triggered \n";
 
@@ -130,7 +152,7 @@ private:
         trayIcon->show();
 
 #ifdef QT_DEBUG
-        showSettingsDialog();
+        //showSettingsDialog();
 #endif
     }
 
@@ -279,6 +301,10 @@ private:
             settings.setValue(C_NOTIFICATION, true);
         }
 
+        if (not settings.contains(C_OPEN_WEBUI_ON_LAUNCH)) {
+            settings.setValue(C_OPEN_WEBUI_ON_LAUNCH, true);
+        }
+
         settings.sync();
     }
 
@@ -337,8 +363,11 @@ private:
     void requestBackgroundPermission() {
         qDebug() << "Requesting background permission...";
 
+        // NOTE: --no-browser is used here, because opening the WebUI
+        // on login (autostart) would be annoying
         auto commandline = g_ptr_array_new();
         g_ptr_array_add(commandline, (gpointer) "SyncThingy");
+        g_ptr_array_add(commandline, (gpointer) C_ARG_NO_BROWSER);
 
         char reason[] = "Reason: Ability to sync data in the background.";
         auto flag = settings.value(C_AUTOSTART).toBool() ? XDP_BACKGROUND_FLAG_AUTOSTART : XDP_BACKGROUND_FLAG_NONE;
@@ -486,16 +515,40 @@ int main(int argc, char *argv[]) {
     SingleApplication::setApplicationName(APP_NAME);
     SingleApplication::setApplicationVersion(VERSION);
 
+    const auto arguments = QCoreApplication::arguments();
+    const bool openSettings = arguments.contains(C_ARG_SETTINGS);
+    const bool noBrowser = arguments.contains(C_ARG_NO_BROWSER);
+
     if (app.isSecondary()) {
-        qDebug() << "this instance is secondary, exiting with 4";
+        if (openSettings) {
+            qDebug() << "secondary instance open settings";
+            app.sendMessage(C_MSG_SETTINGS);
+        }
+        else if (noBrowser == false) {
+            qDebug() << "secondary instance open webui";
+            app.sendMessage(C_MSG_BROWSER);
+        }
+
+        qDebug() << "an instance of Syncthingy is already running (4)";
         return 4;
     }
 
     QSettings settings(APP_NAME, "settings");
-    SyncThingy sth(settings);
+    SyncThingy sth(settings, openSettings, noBrowser);
 
     QObject::connect(&app, &SingleApplication::aboutToQuit, &sth, &SyncThingy::stopProcess);
     QObject::connect(&app, &SingleApplication::instanceStarted, &sth, &SyncThingy::secondaryStarted);
+
+    // NOTE: QueuedConnection is required here!
+    // receivedMessage is emitted directly from QLocalSocket::readyRead.
+    // showSettingsDialog() runs a nested event loop via QDialog::exec().
+    // With a DirectConnection the nested loop would process the socket's
+    // disconnected/deleteLater while the outer readyRead emission is still
+    // on the stack, causing a use-after-free segfault in QIODevice.
+    // Queuing defers the handler until after the socket emission completes.
+    QObject::connect(&app, &SingleApplication::receivedMessage, &sth, [&sth](quint32, const QByteArray message) {
+        sth.handleReceivedMessage(message);
+    }, Qt::QueuedConnection);
 
     return SingleApplication::exec();
 }

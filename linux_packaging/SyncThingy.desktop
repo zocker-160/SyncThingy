@@ -9,3 +9,9 @@ Terminal=false
 Type=Application
 Keywords=synchronization;interface;
 Categories=Network;FileTransfer;P2P
+Actions=settings;
+
+[Desktop Action settings]
+Name=Open Settings...
+Icon=preferences-system
+Exec=SyncThingy --settings

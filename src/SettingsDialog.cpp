@@ -54,9 +54,15 @@ void SettingsDialog::setupUi(const QIcon& icon) {
     auto miscBoxLayout = new QVBoxLayout(miscBox);
 
     autostartBox = new QCheckBox("autostart on login", this);
+
     notificationBox = new QCheckBox("show start/stop notifications", this);
     notificationBox->setToolTip("affects start / stop service notifications only - errors will still be shown");
+
+    openWebUiOnLaunchBox = new QCheckBox("open WebUI on start", this);
+    openWebUiOnLaunchBox->setToolTip("setting ignored on autostart (option above)");
+
     miscBoxLayout->addWidget(autostartBox);
+    miscBoxLayout->addWidget(openWebUiOnLaunchBox);
     miscBoxLayout->addWidget(notificationBox);
 
     // Buttons
@@ -88,6 +94,7 @@ void SettingsDialog::loadSettings() {
 
     autostartBox->setChecked(settings.value(C_AUTOSTART).toBool());
     notificationBox->setChecked(settings.value(C_NOTIFICATION).toBool());
+    openWebUiOnLaunchBox->setChecked(settings.value(C_OPEN_WEBUI_ON_LAUNCH, true).toBool());
 }
 
 void SettingsDialog::saveSettings() {
@@ -98,6 +105,7 @@ void SettingsDialog::saveSettings() {
     settings.setValue(C_ICON, iconSelector->currentText());
     settings.setValue(C_AUTOSTART, autostartBox->isChecked());
     settings.setValue(C_NOTIFICATION, notificationBox->isChecked());
+    settings.setValue(C_OPEN_WEBUI_ON_LAUNCH, openWebUiOnLaunchBox->isChecked());
 
     settings.sync();
 }

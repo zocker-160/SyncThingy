@@ -38,6 +38,7 @@ private:
     QComboBox* iconSelector;
     QCheckBox* autostartBox;
     QCheckBox* notificationBox;
+    QCheckBox* openWebUiOnLaunchBox;
     QPushButton* createBGService;
 
     void setupUi(const QIcon& icon);
