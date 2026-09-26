@@ -34,6 +34,15 @@
 
     <launchable type="desktop-id">com.github.zocker_160.SyncThingy.desktop</launchable>
     <releases>
+        <release version="1.0" date="2026-09-26">
+            <description>
+                <ul>
+                    <li>Open webui on start by default when launched manually</li>
+                    <li>Add cli and settings option to disable webui open on start</li>
+                    <li>Add start menu right click option to open settings</li>
+                </ul>
+            </description>
+        </release>
         <release version="0.8.3" date="2026-03-04">
             <description>
                 <ul>

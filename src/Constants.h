@@ -25,7 +25,7 @@
 #define DEFAULT_IP "127.0.0.1"
 #define DEFAULT_PORT 8384
 
-#define VERSION "v0.8.3"
+#define VERSION "v1.0"
 #define APP_NAME "SyncThingy"
 
 #endif //SYNCTHINGY_CONSTANTS_H
