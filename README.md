@@ -21,6 +21,7 @@ SyncThingy config is located at `~/.var/app/com.github.zocker_160.SyncThingy/con
 - `icon` can be set to `default`, `white` or `black`
 - `url` defines the link opened when selecting `Open WebUI`
 - `notifications` can be `true` or `false`
+- `open-webui-on-launch` can be `true` or `false` (ignored on autostart via xdg-portal)
 
 #### Note
 
