@@ -13,6 +13,15 @@ Why yet another Syncthing tray / statusbar / wrapper / ui ... application?
 
 The answer is simple: I just wanted a Flatpak on Flathub which offers just the bare minimum: Syncthing and a tray icon.
 
+## Desktop environments without tray icon
+
+While SyncThingy is mainly made around the tray icon, since v1.0 users of DEs without support for tray icons (e.g. GNOME)
+can still fully use this application:
+
+- launching from the start menu opens the webui (can be disabled in settings)
+- start menu icon right click menu to open application settings
+
+
 ## Configuration
 
 SyncThingy config is located at `~/.var/app/com.github.zocker_160.SyncThingy/config/SyncThingy`:
